@@ -3,3 +3,16 @@ spring:
     name: init-template
   profiles:
     active: @env@
+  jackson:
+    time-zone: UTC
+    serialization:
+      write-enums-using-to-string: on
+      write-dates-as-timestamps: off
+      fail-on-empty-beans: off
+    default-property-inclusion: always
+    deserialization:
+      fail-on-unknown-properties: off
+    date-format: yyyy-MM-dd HH:mm:ss.SSS
+  messages:
+    basename: messages/lang
+
