@@ -40,11 +40,11 @@
         <async-tool.version>1.0.1</async-tool.version>
         <embedded-redis.version>0.7.3</embedded-redis.version>
         <owasp-java-encoder.version>1.3.1</owasp-java-encoder.version>
-        <redisson-spring-boot-starter.version>3.40.0</redisson-spring-boot-starter.version>
-        <poi.version>5.3.0</poi.version>
+        <redisson-spring-boot-starter.version>3.44.0</redisson-spring-boot-starter.version>
+        <poi.version>5.4.0</poi.version>
         <logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
         <esapi.version>2.6.0.0</esapi.version>
-        <jte.version>3.1.15</jte.version>
+        <jte.version>3.1.16</jte.version>
 
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
         <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
@@ -76,14 +76,14 @@
                 <version>${dotenv-java.version}</version>
             </dependency>
 
-            <!--检测文件编码工具库 https://github.com/albfernandez/juniversalchardet-->
+            <!--检测文件编码工具库 https://github.com/albfernandez/juniversalchardet -->
             <dependency>
                 <groupId>com.github.albfernandez</groupId>
                 <artifactId>juniversalchardet</artifactId>
                 <version>${juniversalchardet.version}</version>
             </dependency>
 
-            <!--https://github.com/bucket4j/bucket4j-->
+            <!--https://github.com/bucket4j/bucket4j -->
             <dependency>
                 <groupId>com.bucket4j</groupId>
                 <artifactId>bucket4j_jdk17-core</artifactId>
@@ -171,7 +171,7 @@
                 <version>${poi.version}</version>
             </dependency>
 
-            <!--https://github.com/tlcsdm/tlcsdm-asyncTool-->
+            <!--https://github.com/tlcsdm/tlcsdm-asyncTool -->
             <dependency>
                 <groupId>com.tlcsdm</groupId>
                 <artifactId>tlcsdm-asyncTool</artifactId>

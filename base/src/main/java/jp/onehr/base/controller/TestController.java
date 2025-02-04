@@ -14,4 +14,10 @@ public class TestController {
         return Map.of("msg1", SpringUtil.getMessage("objSerialize2JsonFailed"));
     }
 
+    @GetMapping("2")
+    public String restartApp() {
+        SpringUtil.restartApp();
+        return "Restart app";
+    }
+
 }

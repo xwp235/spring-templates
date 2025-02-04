@@ -2,13 +2,17 @@ package jp.onehr.base.common.utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import io.micrometer.common.lang.NonNullApi;
+import jp.onehr.base.InitTemplateApplication;
 import jp.onehr.base.common.exception.UtilException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.ListableBeanFactory;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.beans.factory.support.DefaultSingletonBeanRegistry;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.SpringApplication;
 import org.springframework.context.*;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.ResolvableType;
@@ -17,9 +21,11 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
-@NonNullApi
 @Component
+@NonNullApi
 public class SpringUtil implements BeanFactoryPostProcessor, ApplicationContextAware {
 
     /**
@@ -59,7 +65,7 @@ public class SpringUtil implements BeanFactoryPostProcessor, ApplicationContextA
      * @return {@link ConfigurableListableBeanFactory}
      */
     public static ConfigurableListableBeanFactory getConfigurableBeanFactory() throws UtilException {
-        final ConfigurableListableBeanFactory factory;
+        ConfigurableListableBeanFactory factory;
         if (null != beanFactory) {
             factory = beanFactory;
         } else if (applicationContext instanceof ConfigurableApplicationContext) {
@@ -191,7 +197,15 @@ public class SpringUtil implements BeanFactoryPostProcessor, ApplicationContextA
      * @param beanName bean名称
      */
     public static void unregisterBean(String beanName) {
-        final ConfigurableListableBeanFactory factory = getConfigurableBeanFactory();
+        ConfigurableListableBeanFactory factory = getConfigurableBeanFactory();
+        Object beanInstance = factory.getSingleton(beanName);
+        if (beanInstance instanceof DisposableBean) {
+            try {
+                ((DisposableBean) beanInstance).destroy();
+            } catch (Exception e) {
+                throw new UtilException("Can not unregister bean, execute destroy method error occurred!");
+            }
+        }
         if (factory instanceof DefaultSingletonBeanRegistry registry) {
             registry.destroySingleton(beanName);
         } else {
@@ -238,6 +252,35 @@ public class SpringUtil implements BeanFactoryPostProcessor, ApplicationContextA
             return "en";
         }
         return localeStr.split("_")[0];
+    }
+
+    private synchronized static void internalRestartApp() {
+        var args = getBean(ApplicationArguments.class);
+        new Thread(() -> {
+            try {
+                TimeUnit.MICROSECONDS.sleep(500);
+            } catch (InterruptedException e) {
+                throw new UtilException("Execute needed sleep is interrupted!", e);
+            }
+            try {
+                SpringApplication.exit(applicationContext);
+            } catch (Exception e) {
+                throw new UtilException("Exit app error occurred!");
+            }
+            try {
+                SpringApplication.run(InitTemplateApplication.class, args.getSourceArgs());
+            } catch (Exception e) {
+                throw new UtilException("Restart app error occurred!", e);
+            }
+        }).start();
+    }
+
+    public static void restartApp() {
+        try (var executor = Executors.newSingleThreadScheduledExecutor()) {
+            executor.schedule(SpringUtil::internalRestartApp, 1, TimeUnit.SECONDS);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
 }

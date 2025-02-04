@@ -12,7 +12,8 @@ spring:
     default-property-inclusion: always
     deserialization:
       fail-on-unknown-properties: off
-    date-format: yyyy-MM-dd HH:mm:ss.SSS
+    date-format: yyyy-MM-dd HH:mm:ss.SSSXXX
   messages:
     basename: messages/lang
-
+server:
+  shutdown: graceful
