@@ -24,10 +24,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.lang.reflect.ParameterizedType;
-import java.util.Arrays;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -62,7 +59,7 @@ public class SpringUtil implements BeanFactoryPostProcessor, ApplicationContextA
      */
     public static ListableBeanFactory getBeanFactory() {
         var factory = null == beanFactory ? applicationContext : beanFactory;
-        if (null == factory) {
+        if (Objects.isNull(factory)) {
             throw new UtilException("No ConfigurableListableBeanFactory or ApplicationContext injected, maybe not in the Spring environment?");
         }
         return factory;
@@ -75,7 +72,7 @@ public class SpringUtil implements BeanFactoryPostProcessor, ApplicationContextA
      */
     public static ConfigurableListableBeanFactory getConfigurableBeanFactory() throws UtilException {
         ConfigurableListableBeanFactory factory;
-        if (null != beanFactory) {
+        if (Objects.nonNull(beanFactory)) {
             factory = beanFactory;
         } else if (applicationContext instanceof ConfigurableApplicationContext) {
             factory = ((ConfigurableApplicationContext) applicationContext).getBeanFactory();
@@ -129,10 +126,12 @@ public class SpringUtil implements BeanFactoryPostProcessor, ApplicationContextA
      */
     @SuppressWarnings("unchecked")
     public static <T> T getBean(TypeReference<T> reference) {
-        final ParameterizedType parameterizedType = (ParameterizedType) reference.getType();
-        final Class<T> rawType = (Class<T>) parameterizedType.getRawType();
-        final Class<?>[] genericTypes = Arrays.stream(parameterizedType.getActualTypeArguments()).map(type -> (Class<?>) type).toArray(Class[]::new);
-        final String[] beanNames = applicationContext.getBeanNamesForType(ResolvableType.forClassWithGenerics(rawType, genericTypes));
+        var parameterizedType = (ParameterizedType) reference.getType();
+        var rawType = (Class<T>) parameterizedType.getRawType();
+        var genericTypes =
+                Arrays.stream(parameterizedType.getActualTypeArguments()).map(type -> (Class<?>) type).toArray(Class[]::new);
+        var beanNames = applicationContext.getBeanNamesForType(ResolvableType.forClassWithGenerics(rawType,
+                genericTypes));
         return getBean(beanNames[0], rawType);
     }
 
@@ -182,7 +181,7 @@ public class SpringUtil implements BeanFactoryPostProcessor, ApplicationContextA
      * @return 当前的环境配置
      */
     public static String getActiveProfile() {
-        final String[] activeProfiles = getActiveProfiles();
+        var activeProfiles = getActiveProfiles();
         return activeProfiles.length > 0 ? activeProfiles[0] : "default";
     }
 
@@ -194,7 +193,7 @@ public class SpringUtil implements BeanFactoryPostProcessor, ApplicationContextA
      * @param bean     bean
      */
     public static <T> void registerBean(String beanName, T bean) {
-        final ConfigurableListableBeanFactory factory = getConfigurableBeanFactory();
+        var factory = getConfigurableBeanFactory();
         factory.autowireBean(bean);
         factory.registerSingleton(beanName, bean);
     }
@@ -206,11 +205,11 @@ public class SpringUtil implements BeanFactoryPostProcessor, ApplicationContextA
      * @param beanName bean名称
      */
     public static void unregisterBean(String beanName) {
-        ConfigurableListableBeanFactory factory = getConfigurableBeanFactory();
-        Object beanInstance = factory.getSingleton(beanName);
-        if (beanInstance instanceof DisposableBean) {
+        var factory = getConfigurableBeanFactory();
+        var beanInstance = factory.getSingleton(beanName);
+        if (beanInstance instanceof DisposableBean inst) {
             try {
-                ((DisposableBean) beanInstance).destroy();
+                inst.destroy();
             } catch (Exception e) {
                 throw new UtilException("Can not unregister bean, execute destroy method error occurred!", e);
             }
@@ -229,7 +228,7 @@ public class SpringUtil implements BeanFactoryPostProcessor, ApplicationContextA
      * @since 5.7.12
      */
     public static void publishEvent(ApplicationEvent event) {
-        if (null != applicationContext) {
+        if (Objects.nonNull(applicationContext)) {
             applicationContext.publishEvent(event);
         }
     }
@@ -241,7 +240,7 @@ public class SpringUtil implements BeanFactoryPostProcessor, ApplicationContextA
      * @param event 待发布的事件
      */
     public static void publishEvent(Object event) {
-        if (null != applicationContext) {
+        if (Objects.nonNull(applicationContext)) {
             applicationContext.publishEvent(event);
         }
     }
@@ -267,7 +266,7 @@ public class SpringUtil implements BeanFactoryPostProcessor, ApplicationContextA
         try (var executor = Executors.newSingleThreadScheduledExecutor()) {
             executor.schedule(SpringUtil::internalRestartApp, 1, TimeUnit.SECONDS);
         } catch (Exception e){
-            e.printStackTrace();
+            throw new UtilException("Failed to restart the application.", e);
         }
     }
 
@@ -338,14 +337,14 @@ public class SpringUtil implements BeanFactoryPostProcessor, ApplicationContextA
             try {
                 SpringApplication.exit(applicationContext);
             } catch (Exception e) {
-                throw new UtilException("Exit app error occurred!");
+                throw new UtilException("Exit app error occurred!", e);
             }
             try {
                 var sourceArgs = args.getSourceArgs();
                 loadEnvFile(sourceArgs);
                 SpringApplication.run(InitTemplateApplication.class, sourceArgs);
             } catch (Exception e) {
-                throw new UtilException("Restart app error occurred!", e);
+                throw new UtilException("Failed to restart the application.", e);
             }
         }).start();
     }
