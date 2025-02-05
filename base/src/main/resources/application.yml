@@ -15,5 +15,7 @@ spring:
     date-format: yyyy-MM-dd HH:mm:ss.SSSXXX
   messages:
     basename: messages/lang
+  main:
+    banner-mode: off
 server:
   shutdown: graceful

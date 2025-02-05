@@ -1,10 +1,14 @@
 package jp.onehr.base.common.utils;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import io.github.cdimascio.dotenv.Dotenv;
+import io.github.cdimascio.dotenv.DotenvException;
 import io.micrometer.common.lang.NonNullApi;
 import jp.onehr.base.InitTemplateApplication;
 import jp.onehr.base.common.exception.UtilException;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.ListableBeanFactory;
@@ -18,15 +22,20 @@ import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.core.ResolvableType;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
 import java.lang.reflect.ParameterizedType;
 import java.util.Arrays;
+import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 @Component
 @NonNullApi
 public class SpringUtil implements BeanFactoryPostProcessor, ApplicationContextAware {
+
+    private static final Logger logger = LoggerFactory.getLogger(SpringUtil.class);
 
     /**
      * "@PostConstruct"注解标记的类中，由于ApplicationContext还未加载，导致空指针<br>
@@ -203,7 +212,7 @@ public class SpringUtil implements BeanFactoryPostProcessor, ApplicationContextA
             try {
                 ((DisposableBean) beanInstance).destroy();
             } catch (Exception e) {
-                throw new UtilException("Can not unregister bean, execute destroy method error occurred!");
+                throw new UtilException("Can not unregister bean, execute destroy method error occurred!", e);
             }
         }
         if (factory instanceof DefaultSingletonBeanRegistry registry) {
@@ -254,6 +263,70 @@ public class SpringUtil implements BeanFactoryPostProcessor, ApplicationContextA
         return localeStr.split("_")[0];
     }
 
+    public static void restartApp() {
+        try (var executor = Executors.newSingleThreadScheduledExecutor()) {
+            executor.schedule(SpringUtil::internalRestartApp, 1, TimeUnit.SECONDS);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public static void loadEnvFile(String[] args) {
+        try {
+            var useDefaultConfigFilepath = false;
+            if (args.length == 0) {
+                useDefaultConfigFilepath = true;
+                args = new String[] {
+                  System.getProperty("user.dir")
+                };
+            }
+            var configFilePath = args[0];
+
+            if (useDefaultConfigFilepath) {
+                configFilePath = configFilePath + File.separator + "env";
+            }
+            var separatorIndex = configFilePath.lastIndexOf(File.separator);
+            var configFileDir = configFilePath.substring(0, separatorIndex);
+            var configFilename = configFilePath.substring(separatorIndex + 1);
+
+            // 获取当前系统属性
+            var currentEnv = System.getenv();
+            var dotenv = Dotenv.configure()
+                    .directory(configFileDir)
+                    .filename(configFilename)
+                    .load();
+            dotenv.entries().forEach(entry -> {
+                var key = entry.getKey();
+                var val = entry.getValue();
+                if (!currentEnv.containsKey(key)) {
+                    if ("LOGGING_STRUCTURED".equals(key)) {
+                        var logFilename = "classpath:logback-spring.xml";
+                        if ("on".equals(val)) {
+                            logFilename = "classpath:logback-spring-structured.xml";
+                        }
+                        System.setProperty("logging.config", logFilename);
+                    }
+                    System.setProperty(key, val);
+                }
+            });
+        } catch (DotenvException e) {
+            var errorMessage = e.getMessage();
+            var locale = Locale.getDefault();
+            var bundle = ResourceBundle.getBundle("messages/lang", locale);
+            if (errorMessage.contains("Could not find")) {
+                logger.warn(bundle.getString("useDefaultAppConfig"));
+                throw e;
+            } else if (errorMessage.contains("Malformed entry")) {
+                var param = errorMessage.substring(errorMessage.indexOf('y') + 2);
+                logger.warn(bundle.getString("appConfigMalformed"), param);
+                throw e;
+            } else {
+                logger.error(bundle.getString("serverInternalError"), e);
+                throw e;
+            }
+        }
+    }
+
     private synchronized static void internalRestartApp() {
         var args = getBean(ApplicationArguments.class);
         new Thread(() -> {
@@ -268,19 +341,13 @@ public class SpringUtil implements BeanFactoryPostProcessor, ApplicationContextA
                 throw new UtilException("Exit app error occurred!");
             }
             try {
-                SpringApplication.run(InitTemplateApplication.class, args.getSourceArgs());
+                var sourceArgs = args.getSourceArgs();
+                loadEnvFile(sourceArgs);
+                SpringApplication.run(InitTemplateApplication.class, sourceArgs);
             } catch (Exception e) {
                 throw new UtilException("Restart app error occurred!", e);
             }
         }).start();
-    }
-
-    public static void restartApp() {
-        try (var executor = Executors.newSingleThreadScheduledExecutor()) {
-            executor.schedule(SpringUtil::internalRestartApp, 1, TimeUnit.SECONDS);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
     }
 
 }

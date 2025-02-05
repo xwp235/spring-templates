@@ -9,8 +9,8 @@ description="Base"
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.apache.commons:commons-lang3'
-
-    runtimeOnly 'io.github.cdimascio:dotenv-java'
+    implementation 'io.github.cdimascio:dotenv-java'
+    implementation 'net.logstash.logback:logstash-logback-encoder'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
