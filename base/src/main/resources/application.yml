@@ -40,6 +40,25 @@ spring:
     hiddenmethod:
       filter:
         enabled: on
+  task:
+    scheduling:
+      pool:
+        size: 40
+      thread-name-prefix: asyncScheduleTask-
+      shutdown:
+        await-termination: on
+        await-termination-period: PT3M
+    execution:
+      pool:
+        max-size: 30
+        core-size: 10
+        queue-capacity: 80
+        keep-alive: 600s
+      thread-name-prefix: asyncTask-
+      shutdown:
+        await-termination: on
+        await-termination-period: PT3M
+
 config:
   default-timezone: ${APP_TIMEZONE:spring.jackson.time-zone}
   default-datetime-pattern: ${APP_DATETIME_PATTERN:spring.jackson.date-format}

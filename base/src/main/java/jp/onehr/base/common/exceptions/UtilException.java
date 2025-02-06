@@ -1,4 +1,4 @@
-package jp.onehr.base.common.exception;
+package jp.onehr.base.common.exceptions;
 
 import jp.onehr.base.common.utils.ExceptionUtil;
 

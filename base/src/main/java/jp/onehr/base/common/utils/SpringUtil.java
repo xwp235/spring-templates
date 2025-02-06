@@ -5,7 +5,7 @@ import io.github.cdimascio.dotenv.Dotenv;
 import io.github.cdimascio.dotenv.DotenvException;
 import io.micrometer.common.lang.NonNullApi;
 import jp.onehr.base.InitTemplateApplication;
-import jp.onehr.base.common.exception.UtilException;
+import jp.onehr.base.common.exceptions.UtilException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
