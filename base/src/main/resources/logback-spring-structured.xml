@@ -22,7 +22,7 @@
                     <timestamp>
                         <fieldName>time</fieldName>
                         <timeZone>UTC</timeZone>
-                        <pattern>yyyy-MM-dd'T'HH:mm:ss.SSSXXX</pattern>
+                        <pattern>yyyy-MM-dd'T'HH:mm:ss.SSSZ</pattern>
                     </timestamp>
                     <logLevel>
                         <fieldName>level</fieldName>
@@ -63,7 +63,7 @@
                     <timestamp>
                         <fieldName>time</fieldName>
                         <timeZone>UTC</timeZone>
-                        <pattern>yyyy-MM-dd'T'HH:mm:ss.SSSXXX</pattern>
+                        <pattern>yyyy-MM-dd'T'HH:mm:ss.SSSZ</pattern>
                     </timestamp>
                     <logLevel>
                         <fieldName>level</fieldName>

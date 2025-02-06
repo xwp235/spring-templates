@@ -6,9 +6,12 @@ import jp.onehr.base.common.config.properties.SystemProperties;
 import jp.onehr.base.common.config.serializer.LocalDateTimeSerializer;
 import jp.onehr.base.common.config.serializer.ZonedDateTimeSerializer;
 import jp.onehr.base.common.constants.AppConstants;
+import jp.onehr.base.common.filters.EntryPointFilter;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -74,6 +77,16 @@ public class AppConfig implements WebMvcConfigurer {
         var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**",configuration);
         return source;
+    }
+
+    @Bean
+    FilterRegistrationBean<EntryPointFilter> entryPointFilter() {
+        var registrationBean = new FilterRegistrationBean<EntryPointFilter>();
+        registrationBean.setFilter(new EntryPointFilter());
+        registrationBean.setUrlPatterns(List.of("/*"));
+        registrationBean.setEnabled(true);
+        registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return registrationBean;
     }
 
 }
