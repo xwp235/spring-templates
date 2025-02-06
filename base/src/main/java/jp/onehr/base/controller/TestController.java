@@ -4,6 +4,9 @@ import jp.onehr.base.common.utils.SpringUtil;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.Map;
 
 @RestController
@@ -18,6 +21,18 @@ public class TestController {
     public String restartApp() {
         SpringUtil.restartApp();
         return "Restart app";
+    }
+
+    @GetMapping("3")
+    public Map<String,Object> test3() {
+        var ld1 = LocalDateTime.now();
+        var d1 = new Date();
+        var zd1 = ZonedDateTime.now();
+        return Map.of(
+                "d1",d1,
+                "zd1",zd1,
+                "localDateTime1",ld1,"double1", 1.24,
+                "float1",1.1f,"long1",100L);
     }
 
 }

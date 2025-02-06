@@ -20,3 +20,20 @@ gradle clean --warning-mode all
 # 或
 gradle build --warning-mode all
 ```
+
+#### 打包后的jar启动命令
+```bash
+java -Dspring.profiles.active=dev -Duser.timezone=UTC -Dfile.encoding=UTF-8 -jar base-1.0.0.jar D:\GithubRepos\spring-templates\base\env
+```
+
+#### 当前项目支持配置
+```html
+# 是否开启结构化日志
+LOGGING_STRUCTURED=off
+# 生产环境下的日志路径
+LOG_PATH=D:\logs
+# 项目使用的默认时区
+APP_TIMEZONE=UTC
+# 项目使用的默认日期格式
+APP_DATETIME_PATTERN=yyyy-MM-dd'T'HH:mm:ss.SSSZ
+```

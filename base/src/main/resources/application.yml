@@ -1,6 +1,17 @@
+server:
+  shutdown: graceful
+  servlet:
+    session:
+      cookie:
+        # 必须配置，防止使用spring-session做session管理时导致相互间session不一致
+        name: APP-SESSION-ID
 spring:
   application:
     name: init-template
+  #  https://docs.spring.io/spring-boot/docs/3.2.0/reference/htmlsingle/#features.spring-application.virtual-threads
+  threads:
+    virtual:
+      enabled: on
   profiles:
     active: @env@
   jackson:
@@ -12,10 +23,25 @@ spring:
     default-property-inclusion: always
     deserialization:
       fail-on-unknown-properties: off
-    date-format: yyyy-MM-dd HH:mm:ss.SSSXXX
+    date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZ
   messages:
     basename: messages/lang
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 60MB
+      enabled: on
   main:
     banner-mode: off
-server:
-  shutdown: graceful
+    keep-alive: on
+  mvc:
+    log-request-details: on
+    # spring-boot 2.2版本后要手动开启form的_method对delete和put的处理
+    hiddenmethod:
+      filter:
+        enabled: on
+config:
+  default-timezone: ${APP_TIMEZONE:spring.jackson.time-zone}
+  default-datetime-pattern: ${APP_DATETIME_PATTERN:spring.jackson.date-format}
+  logging:
+    structured: ${LOGGING_STRUCTURED:off}
