@@ -36,4 +36,6 @@ LOG_PATH=D:\logs
 APP_TIMEZONE=UTC
 # 项目使用的默认日期格式
 APP_DATETIME_PATTERN=yyyy-MM-dd'T'HH:mm:ss.SSSZ
+# 日志文件中的日期时区
+LOG_TIMEZONE=Asia/Tokyo
 ```
