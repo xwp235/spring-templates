@@ -9,7 +9,6 @@ import jp.onehr.base.common.constants.AppConstants;
 import jp.onehr.base.common.utils.ServletUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
-import org.springframework.http.HttpMethod;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -25,10 +24,8 @@ public class EntryPointFilter extends OncePerRequestFilter {
             logId = UUID.randomUUID().toString();
         }
         try {
-            // 将 LOG_ID 放入 MDC
             MDC.put(AppConstants.MDC.LOG_ID, logId);
-            var isGet = StringUtils.equalsIgnoreCase(request.getMethod(), HttpMethod.GET.name());
-            if (!isGet && ServletUtil.isAjaxRequest(request)) {
+            if (!ServletUtil.isGetMethod(request) && ServletUtil.isAjaxRequest(request)) {
                 filterChain.doFilter(new ReusableHttpServletRequestWrapper(request), response);
             } else {
                 filterChain.doFilter(request, response);
