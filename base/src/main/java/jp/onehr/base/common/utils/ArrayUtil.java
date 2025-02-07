@@ -192,4 +192,18 @@ public class ArrayUtil {
         return -1;
     }
 
+    public static String join(String[] array, String delimiter) {
+        if (array == null || array.length == 0) {
+            return "";
+        }
+        StringBuilder sb = new StringBuilder();
+        for (String s : array) {
+            if (!sb.isEmpty()) {
+                sb.append(delimiter);
+            }
+            sb.append(s != null ? s : "");
+        }
+        return sb.toString();
+    }
+
 }

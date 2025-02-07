@@ -25,6 +25,7 @@ public class EntryPointFilter extends OncePerRequestFilter {
         }
         try {
             MDC.put(AppConstants.MDC.LOG_ID, logId);
+            ServletUtil.setHeader(response, AppConstants.X_REQUESTED_ID, logId);
             if (!ServletUtil.isGetMethod(request) && ServletUtil.isAjaxRequest(request)) {
                 filterChain.doFilter(new ReusableHttpServletRequestWrapper(request), response);
             } else {

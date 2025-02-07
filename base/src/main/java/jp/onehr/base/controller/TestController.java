@@ -1,5 +1,7 @@
 package jp.onehr.base.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jp.onehr.base.common.utils.ServletUtil;
 import jp.onehr.base.common.utils.SpringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,6 +86,12 @@ public class TestController {
     @PostMapping("5")
     public void test5(@RequestPart User user,@RequestPart MultipartFile file,@RequestPart String xml) {
 
+    }
+
+    @PostMapping("6")
+    public void test6(HttpServletRequest request,@RequestBody User user) {
+        System.out.println(ServletUtil.getBodyBytes(request).length);
+        System.out.println(ServletUtil.getBody(request));
     }
 
     public static class Person {

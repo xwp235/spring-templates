@@ -13,12 +13,12 @@
 
     <profiles>
         <profile>
-            <id>prod</id>
+            <id>dev</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
-                <env>prod</env>
+                <env>dev</env>
             </properties>
         </profile>
     </profiles>
