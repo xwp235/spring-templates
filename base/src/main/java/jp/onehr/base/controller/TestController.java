@@ -90,9 +90,11 @@ public class TestController {
 
     @PostMapping("6")
     public void test6(HttpServletRequest request,@RequestBody User user) {
-        System.out.println(ServletUtil.getBodyBytes(request).length);
-        System.out.println(ServletUtil.getBody(request));
-        System.out.println(ServletUtil.getClientIP(request));
+//        System.out.println(ServletUtil.getBodyBytes(request).length);
+//        System.out.println(ServletUtil.getBody(request));
+//        System.out.println(ServletUtil.getClientIP(request));
+        int a = 1/0;
+//        userService.getList();
     }
 
     public static class Person {

@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -96,21 +97,21 @@ public class ServletUtil {
 
     // --------------------------------------------------------- Response start
 
-//    /**
-//     * 获得PrintWriter
-//     *
-//     * @param response 响应对象{@link HttpServletResponse}
-//     * @return 获得PrintWriter
-//     * @throws IORuntimeException IO异常
-//     */
-//    public static PrintWriter getWriter(HttpServletResponse response) throws IORuntimeException {
-//        try {
-//            return response.getWriter();
-//        } catch (IOException e) {
-//            throw new IORuntimeException(e);
-//        }
-//    }
-//
+    /**
+     * 获得PrintWriter
+     *
+     * @param response 响应对象{@link HttpServletResponse}
+     * @return 获得PrintWriter
+     * @throws IORuntimeException IO异常
+     */
+    public static PrintWriter getWriter(HttpServletResponse response) throws IORuntimeException {
+        try {
+            return response.getWriter();
+        } catch (IOException e) {
+            throw new IORuntimeException(e);
+        }
+    }
+
 //    /**
 //     * 返回数据给客户端
 //     *

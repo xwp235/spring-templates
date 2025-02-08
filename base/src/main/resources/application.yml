@@ -40,6 +40,7 @@ spring:
     hiddenmethod:
       filter:
         enabled: on
+    static-path-pattern: /static/**
   task:
     scheduling:
       pool:
