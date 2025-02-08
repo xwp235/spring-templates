@@ -92,6 +92,7 @@ public class TestController {
     public void test6(HttpServletRequest request,@RequestBody User user) {
         System.out.println(ServletUtil.getBodyBytes(request).length);
         System.out.println(ServletUtil.getBody(request));
+        System.out.println(ServletUtil.getClientIP(request));
     }
 
     public static class Person {
