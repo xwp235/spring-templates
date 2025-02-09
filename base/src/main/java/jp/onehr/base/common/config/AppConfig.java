@@ -2,14 +2,11 @@ package jp.onehr.base.common.config;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jp.onehr.base.common.config.properties.SystemProperties;
 import jp.onehr.base.common.config.serializer.LocalDateTimeSerializer;
 import jp.onehr.base.common.config.serializer.ZonedDateTimeSerializer;
 import jp.onehr.base.common.constants.AppConstants;
 import jp.onehr.base.common.filters.EntryPointFilter;
-import jp.onehr.base.common.utils.ServletUtil;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -18,19 +15,12 @@ import org.springframework.core.Ordered;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.servlet.HandlerExceptionResolver;
-import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.NoHandlerFoundException;
-import org.springframework.web.servlet.View;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.mvc.support.DefaultHandlerExceptionResolver;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Map;
 
 @Configuration
 @EnableConfigurationProperties(SystemProperties.class)

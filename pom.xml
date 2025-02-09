@@ -49,6 +49,7 @@
         <flatten-maven-plugin.version>1.6.0</flatten-maven-plugin.version>
         <maven-surefire-plugin.version>3.5.2</maven-surefire-plugin.version>
         <maven-compiler-plugin.version>3.13.0</maven-compiler-plugin.version>
+        <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
 
         <java.version>21</java.version>
         <skipTests>true</skipTests>
@@ -259,6 +260,16 @@
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
                     <version>${spring-boot.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>gg.jte</groupId>
+                    <artifactId>jte-maven-plugin</artifactId>
+                    <version>${jte.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-resources-plugin</artifactId>
+                    <version>${maven-resources-plugin.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

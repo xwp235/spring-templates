@@ -49,6 +49,10 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
+        <dependency>
+            <groupId>gg.jte</groupId>
+            <artifactId>jte</artifactId>
+        </dependency>
 
 
     </dependencies>
@@ -77,6 +81,51 @@
                 <configuration>
                     <mainClass>jp.onehr.base.InitTemplateApplication</mainClass>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>gg.jte</groupId>
+                <artifactId>jte-maven-plugin</artifactId>
+                <configuration>
+                    <sourceDirectory>${basedir}/src/main/resources/templates</sourceDirectory>
+                    <contentType>Html</contentType>
+                    <binaryStaticContent>true</binaryStaticContent>
+                    <targetDirectory/>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Since we use precompiled binary content parts, we need to copy those resources next to the compiled class files (the maven plugin doesn't do that for us) -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.outputDirectory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${basedir}/target/generated-sources/jte</directory>
+                                    <includes>
+                                        <include>**/*.bin</include>
+                                    </includes>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
 

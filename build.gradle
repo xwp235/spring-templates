@@ -44,6 +44,7 @@ subprojects {
         implementation "io.github.cdimascio:dotenv-java:3.1.0"
         implementation "net.logstash.logback:logstash-logback-encoder:8.0"
         implementation "commons-io:commons-io:2.18.0"
+        implementation "gg.jte:jte:3.1.16"
     }
     // 编译环境 JDK-21+
     java {
