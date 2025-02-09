@@ -1,7 +1,7 @@
 package jp.onehr.base.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jp.onehr.base.common.utils.ServletUtil;
+import jp.onehr.base.common.exceptions.AppException;
 import jp.onehr.base.common.utils.SpringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,6 +95,15 @@ public class TestController {
 //        System.out.println(ServletUtil.getClientIP(request));
         int a = 1/0;
 //        userService.getList();
+    }
+
+    @GetMapping("7")
+    public void test7() {
+       try {
+           int a = 1/0;
+       } catch (Exception e) {
+           throw new AppException(e);
+       }
     }
 
     public static class Person {

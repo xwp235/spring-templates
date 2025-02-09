@@ -12,6 +12,7 @@ dependencies {
     implementation 'commons-io:commons-io'
     implementation 'io.github.cdimascio:dotenv-java'
     implementation 'net.logstash.logback:logstash-logback-encoder'
+    implementation 'com.google.code.gson:gson'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 

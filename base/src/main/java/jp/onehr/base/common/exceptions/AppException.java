@@ -1,6 +1,8 @@
 package jp.onehr.base.common.exceptions;
 
+import jp.onehr.base.common.constants.StatusCodeConstants;
 import jp.onehr.base.common.enums.ExceptionLevel;
+import jp.onehr.base.common.utils.SpringUtil;
 
 import java.io.Serial;
 
@@ -12,12 +14,13 @@ public class AppException extends StatefulException {
     private static final long serialVersionUID = 6057602589533840890L;
 
     public AppException(Throwable throwable) {
-        super(500, "Server error", throwable, false, false);
+        super(StatusCodeConstants.SERVER_INTERNAL_ERROR,
+                SpringUtil.getMessage("serverInternalError"), throwable, false, false);
         level = ExceptionLevel.ERROR;
     }
 
     public AppException(int code, ExceptionLevel level, Throwable throwable) {
-        super(code, "Server error", throwable, false, false);
+        super(code, SpringUtil.getMessage("serverInternalError"), throwable, false, false);
         this.level = level;
     }
 
@@ -27,17 +30,27 @@ public class AppException extends StatefulException {
     }
 
     public AppException(ExceptionLevel level, String message, Throwable throwable) {
-        super(500,message, throwable, false, false);
+        super(StatusCodeConstants.SERVER_INTERNAL_ERROR, message, throwable, false, false);
         this.level = level;
     }
 
     public AppException(String message, ExceptionLevel level, Throwable throwable) {
-        super(500,message, throwable, false, false);
+        super(StatusCodeConstants.SERVER_INTERNAL_ERROR, message, throwable, false, false);
         this.level = level;
+    }
+
+    public AppException(String message, Throwable throwable) {
+        super(StatusCodeConstants.SERVER_INTERNAL_ERROR, message, throwable, false, false);
+        this.level = ExceptionLevel.ERROR;
+    }
+
+    public AppException(int code, String message, Throwable throwable) {
+        super(code, message, throwable, false, false);
+        this.level = ExceptionLevel.ERROR;
     }
 
     public ExceptionLevel getLevel() {
         return this.level;
     }
-    
+
 }
