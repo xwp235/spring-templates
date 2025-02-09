@@ -99,17 +99,19 @@ public class AppConfig implements WebMvcConfigurer {
         return registrationBean;
     }
 
-    @Override
-    public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
-        resolvers.remove(resolvers.size()-1);
-        resolvers.add(new DefaultHandlerExceptionResolver(){
-            @Override
-            public ModelAndView handleNoHandlerFoundException(NoHandlerFoundException ex,
-                                                                 HttpServletRequest request,
-                                                                 HttpServletResponse response,
-                                                                 Object handler) throws IOException {
-                return new ModelAndView((model, request1, response1) -> ServletUtil.getWriter(response1).println(ex.getMessage()));
-            }
-        });
-    }
+// 有ExceptionHandler注解时重写此方法无效
+//    @Override
+//    public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
+//        resolvers.remove(resolvers.size()-1);
+//        resolvers.add(new DefaultHandlerExceptionResolver(){
+//            @Override
+//            public ModelAndView handleNoHandlerFoundException(NoHandlerFoundException ex,
+//                                                                 HttpServletRequest request,
+//                                                                 HttpServletResponse response,
+//                                                                 Object handler) throws IOException {
+//                return new ModelAndView((model, request1, response1) -> ServletUtil.getWriter(response1).println(ex.getMessage()));
+//            }
+//        });
+//    }
+
 }
