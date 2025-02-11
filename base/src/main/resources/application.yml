@@ -5,6 +5,12 @@ server:
       cookie:
         # 必须配置，防止使用spring-session做session管理时导致相互间session不一致
         name: APP-SESSION-ID
+  error:
+    include-exception: on
+    include-message: always
+    whitelabel:
+      enabled: off
+    path: /error
 spring:
   application:
     name: init-template
@@ -41,6 +47,9 @@ spring:
       filter:
         enabled: on
     static-path-pattern: /static/**
+    view:
+      prefix: /templates/
+      suffix: .jte
   task:
     scheduling:
       pool:

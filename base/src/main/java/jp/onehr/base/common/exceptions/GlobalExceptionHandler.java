@@ -1,19 +1,18 @@
 package jp.onehr.base.common.exceptions;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jp.onehr.base.common.resp.JsonResp;
 import jp.onehr.base.common.utils.ServletUtil;
 import jp.onehr.base.common.utils.SpringUtil;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
-import org.springframework.web.ErrorResponse;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.servlet.ModelAndView;
+
+import java.util.Date;
 
 /**
  *
@@ -27,13 +26,19 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public Object httpRequestMethodNotSupportedException(HttpServletRequest request, Model model) {
+    public Object httpRequestMethodNotSupportedException(HttpServletRequest request, HttpServletResponse response) {
         if (ServletUtil.isAjaxRequest(request)) {
             return ResponseEntity.status(200)
                     .body(JsonResp.error(SpringUtil.getMessage("request_method_not_supported")).setCode(HttpStatus.METHOD_NOT_ALLOWED.value()));
         } else {
-            System.out.println("***");
-            return null;
+            ModelAndView mav = new ModelAndView("error");
+            mav.setStatus(HttpStatus.METHOD_NOT_ALLOWED); // 直接设置 HTTP 状态码
+            mav.addObject("message", "请求方法不被支持");
+            mav.addObject("type","405");
+            mav.addObject("error","error");
+            mav.addObject("timestamp",new Date());
+            mav.addObject("status",405);
+            return mav;
         }
     }
 

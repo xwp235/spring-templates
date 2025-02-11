@@ -18,13 +18,12 @@ import java.nio.file.Paths;
 public class JteConfig {
 
     @Value("${spring.profiles.active:dev}")
+    private String activeProfile;
 
     @Bean
     ViewResolver jteViewResolve(TemplateEngine templateEngine) {
         return new JteViewResolver(templateEngine);
     }
-
-    private String activeProfile;
 
     @Bean
     TemplateEngine templateEngine() {
@@ -35,7 +34,7 @@ public class JteConfig {
         } else {
             // Here, a JTE file watcher will recompile the JTE templates upon file save (the web browser will auto-refresh)
             // If using IntelliJ, use Ctrl-F9 to trigger an auto-refresh when editing non-JTE files.
-            CodeResolver codeResolver = new DirectoryCodeResolver(Path.of("src", "main", "resources","templates"));
+            CodeResolver codeResolver = new DirectoryCodeResolver(Path.of("base","src", "main","resources","templates"));
             TemplateEngine templateEngine = TemplateEngine.create(codeResolver, Paths.get("jte-classes"), ContentType.Html, getClass().getClassLoader());
             templateEngine.setBinaryStaticContent(true);
             return templateEngine;
