@@ -13,6 +13,12 @@ public class AppException extends StatefulException {
     @Serial
     private static final long serialVersionUID = 6057602589533840890L;
 
+    public AppException() {
+        super(StatusCodeConstants.SERVER_INTERNAL_ERROR,
+                SpringUtil.getMessage("serverInternalError"),null, false, false);
+        level = ExceptionLevel.ERROR;
+    }
+
     public AppException(Throwable throwable) {
         super(StatusCodeConstants.SERVER_INTERNAL_ERROR,
                 SpringUtil.getMessage("serverInternalError"), throwable, false, false);
@@ -24,8 +30,18 @@ public class AppException extends StatefulException {
         this.level = level;
     }
 
+    public AppException(int code, ExceptionLevel level) {
+        super(code, SpringUtil.getMessage("serverInternalError"), null, false, false);
+        this.level = level;
+    }
+
     public AppException(int code, ExceptionLevel level, String message, Throwable throwable) {
         super(code,message, throwable, false, false);
+        this.level = level;
+    }
+
+    public AppException(int code, ExceptionLevel level, String message) {
+        super(code,message, null, false, false);
         this.level = level;
     }
 
@@ -34,8 +50,18 @@ public class AppException extends StatefulException {
         this.level = level;
     }
 
+    public AppException(ExceptionLevel level, String message) {
+        super(StatusCodeConstants.SERVER_INTERNAL_ERROR, message, null, false, false);
+        this.level = level;
+    }
+
     public AppException(String message, ExceptionLevel level, Throwable throwable) {
         super(StatusCodeConstants.SERVER_INTERNAL_ERROR, message, throwable, false, false);
+        this.level = level;
+    }
+
+    public AppException(String message, ExceptionLevel level) {
+        super(StatusCodeConstants.SERVER_INTERNAL_ERROR, message, null, false, false);
         this.level = level;
     }
 
@@ -44,8 +70,18 @@ public class AppException extends StatefulException {
         this.level = ExceptionLevel.ERROR;
     }
 
+    public AppException(String message) {
+        super(StatusCodeConstants.SERVER_INTERNAL_ERROR, message, null, false, false);
+        this.level = ExceptionLevel.ERROR;
+    }
+
     public AppException(int code, String message, Throwable throwable) {
         super(code, message, throwable, false, false);
+        this.level = ExceptionLevel.ERROR;
+    }
+
+    public AppException(int code, String message) {
+        super(code, message, null, false, false);
         this.level = ExceptionLevel.ERROR;
     }
 

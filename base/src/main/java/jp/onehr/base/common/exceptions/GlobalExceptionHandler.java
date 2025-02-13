@@ -1,18 +1,27 @@
 package jp.onehr.base.common.exceptions;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jp.onehr.base.InitTemplateApplication;
+import jp.onehr.base.common.enums.ExceptionLevel;
 import jp.onehr.base.common.resp.JsonResp;
 import jp.onehr.base.common.utils.ServletUtil;
 import jp.onehr.base.common.utils.SpringUtil;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
-import java.util.Date;
+import java.util.Objects;
 
 /**
  *
@@ -25,24 +34,66 @@ import java.util.Date;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public Object httpRequestMethodNotSupportedException(HttpServletRequest request, HttpServletResponse response) {
+    public Object httpRequestMethodNotSupportedException(HttpServletRequest request) {
+        var message = SpringUtil.getMessage("request_method_not_supported");
+        var httpStatus = HttpStatus.METHOD_NOT_ALLOWED;
         if (ServletUtil.isAjaxRequest(request)) {
-            return ResponseEntity.status(200)
-                    .body(JsonResp.error(SpringUtil.getMessage("request_method_not_supported")).setCode(HttpStatus.METHOD_NOT_ALLOWED.value()));
+            return ResponseEntity.status(HttpStatus.OK.value())
+                    .body(JsonResp
+                            .error(message)
+                            .setCode(httpStatus.value())
+                    );
         } else {
-            ModelAndView mav = new ModelAndView("error");
-            mav.setStatus(HttpStatus.METHOD_NOT_ALLOWED); // 直接设置 HTTP 状态码
-            mav.addObject("message", "请求方法不被支持");
-            mav.addObject("type","405");
-            mav.addObject("error","error");
-            mav.addObject("timestamp",new Date());
-            mav.addObject("status",405);
-            return mav;
+            return errorView("error", message,httpStatus);
         }
     }
 
-//
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public Object noHandlerFoundException(HttpServletRequest request) {
+        var httpStatus = HttpStatus.NOT_FOUND;
+        var message = SpringUtil.getMessage("notFound");
+        if (ServletUtil.isAjaxRequest(request)) {
+            return ResponseEntity.status(HttpStatus.OK.value())
+                    .body(JsonResp
+                            .error(message)
+                            .setCode(httpStatus.value())
+                    );
+        } else {
+            return errorView("404", message, httpStatus);
+        }
+    }
+
+    /**
+     * 业务异常统一处理
+     */
+    @ExceptionHandler(AppException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.OK)
+    public JsonResp appException(AppException e) {
+        var rootErrorInfo = getRootErrorInfo(e);
+        var message = e.getMessage();
+        var level = e.getLevel();
+        if (Objects.isNull(rootErrorInfo)) {
+            if (level==ExceptionLevel.ERROR||level==ExceptionLevel.FATAL) {
+                message = SpringUtil.getMessage("appErrorOccurred");
+            } else {
+                message = SpringUtil.getMessage("appWarningOccurred");
+            }
+        }
+        if (level==ExceptionLevel.ERROR||level==ExceptionLevel.FATAL) {
+            logger.error(message, e);
+        } else if (level==ExceptionLevel.WARN) {
+            logger.warn(message, e);
+        } else {
+            logger.info(message, e);
+        }
+        return JsonResp.error(message).setCode(e.getCode())
+                .setExceptionTypeWithTraceId(level);
+    }
+
 //    @Override
 //    protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(HttpMediaTypeNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 //        return super.handleHttpMediaTypeNotSupported(ex, headers, status, request);
@@ -82,12 +133,9 @@ public class GlobalExceptionHandler {
 //    protected ResponseEntity<Object> handleHandlerMethodValidationException(HandlerMethodValidationException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 //        return super.handleHandlerMethodValidationException(ex, headers, status, request);
 //    }
-//
-//    @Override
-//    protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-//        return super.handleNoHandlerFoundException(ex, headers, status, request);
-//    }
-//
+
+
+
 //    @Override
 //    protected ResponseEntity<Object> handleNoResourceFoundException(NoResourceFoundException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 //        return super.handleNoResourceFoundException(ex, headers, status, request);
@@ -142,5 +190,38 @@ public class GlobalExceptionHandler {
 //    public ResponseEntity<Object> handleExceptionInternal(Exception ex, Object body, HttpHeaders headers, HttpStatusCode statusCode, WebRequest request) {
 //        return super.handleExceptionInternal(ex, body, headers, statusCode, request);
 //    }
+
+    private ModelAndView errorView(String viewName, String message,HttpStatus status) {
+        var mav = new ModelAndView(viewName);
+        mav.setStatus(status);
+        mav.addObject("message", message);
+        mav.addObject("status",status.value());
+        return mav;
+    }
+
+    private RootErrorInfo getRootErrorInfo(Throwable e) {
+        var rootCause = ExceptionUtils.getRootCause(e);
+        if (Objects.isNull(rootCause)) {
+            return null;
+        }
+        var stackTrace = rootCause.getStackTrace();
+        if (ArrayUtils.isEmpty(stackTrace)) {
+            return null;
+        }
+        var rootPackage = ClassUtils.getPackageName(InitTemplateApplication.class);
+        return getRootInfoDetail(stackTrace, rootPackage);
+    }
+
+    private RootErrorInfo getRootInfoDetail(StackTraceElement[] stackTrace, String rootPackage) {
+        var info = stackTrace[0];
+        for (var stackTraceElement : stackTrace) {
+            var stackElStr = stackTraceElement.toString();
+            if (stackElStr.contains(rootPackage)) {
+                info = stackTraceElement;
+                break;
+            }
+        }
+        return new RootErrorInfo(info.getLineNumber(),info.getClassName(),info.getMethodName());
+    }
 
 }

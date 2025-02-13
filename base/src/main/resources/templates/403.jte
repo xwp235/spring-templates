@@ -1,7 +1,7 @@
 @param String message
 @param Integer status
 
-<h2>Error Page</h2>
+<h2>403 Page</h2>
 
 ${message}
 ${status}

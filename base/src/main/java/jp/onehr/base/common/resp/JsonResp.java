@@ -100,9 +100,7 @@ public final class JsonResp extends LinkedHashMap<String, Object> implements Ser
     }
 
     public JsonResp setExceptionTypeWithTraceId(ExceptionLevel level) {
-        if (level == ExceptionLevel.ERROR || level == ExceptionLevel.WARN) {
-            this.put("traceId", MDC.get(AppConstants.MDC.LOG_ID));
-        }
+        this.put("traceId", MDC.get(AppConstants.MDC.LOG_ID));
         this.put("exceptionLevel", level);
         return this;
     }

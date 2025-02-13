@@ -1,6 +1,7 @@
 package jp.onehr.base.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jp.onehr.base.common.enums.ExceptionLevel;
 import jp.onehr.base.common.exceptions.AppException;
 import jp.onehr.base.common.utils.SpringUtil;
 import org.slf4j.Logger;
@@ -105,6 +106,16 @@ public class TestController {
        } catch (Exception e) {
            throw new AppException(e);
        }
+    }
+
+    @GetMapping("8")
+    public void test8() {
+//      throw new AppException();
+        try{
+            int a = 1/0;
+        }  catch (Exception e){
+            throw new AppException(50001, ExceptionLevel.WARN,"App error occurred:",e);
+        }
     }
 
     public static class Person {

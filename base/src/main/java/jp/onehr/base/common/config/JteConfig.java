@@ -27,15 +27,14 @@ public class JteConfig {
 
     @Bean
     TemplateEngine templateEngine() {
-
         if ("prod".equals(activeProfile)) {
             // Templates will be compiled by the maven build task
             return TemplateEngine.createPrecompiled(ContentType.Html);
         } else {
             // Here, a JTE file watcher will recompile the JTE templates upon file save (the web browser will auto-refresh)
             // If using IntelliJ, use Ctrl-F9 to trigger an auto-refresh when editing non-JTE files.
-            CodeResolver codeResolver = new DirectoryCodeResolver(Path.of("base","src", "main","resources","templates"));
-            TemplateEngine templateEngine = TemplateEngine.create(codeResolver, Paths.get("jte-classes"), ContentType.Html, getClass().getClassLoader());
+            var codeResolver = new DirectoryCodeResolver(Path.of("base","src", "main","resources","templates"));
+            var templateEngine = TemplateEngine.create(codeResolver, Paths.get("jte-classes"), ContentType.Html, getClass().getClassLoader());
             templateEngine.setBinaryStaticContent(true);
             return templateEngine;
         }
