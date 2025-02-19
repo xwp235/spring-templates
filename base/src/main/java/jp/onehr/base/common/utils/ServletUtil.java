@@ -91,7 +91,8 @@ public class ServletUtil {
         var contentLength = request.getContentLength();
         var acceptJson = Objects.nonNull(acceptHeader) && acceptHeader.contains(MediaType.APPLICATION_JSON_VALUE);
         var contentJson = Objects.nonNull(contentType) && StringUtils.equals(contentType, MediaType.APPLICATION_JSON_VALUE) && contentLength > 0;
-        var testTool = Objects.isNull(contentType) && contentLength<0 && Objects.nonNull(acceptHeader) && acceptHeader.contains(MediaType.ALL_VALUE);
+        var testTool =
+                Objects.isNull(contentType) && contentLength<0 && Objects.nonNull(acceptHeader) && StringUtils.equals(acceptHeader,MediaType.ALL_VALUE);
         return acceptJson || contentJson || testTool;
     }
 

@@ -1,6 +1,5 @@
 package jp.onehr.base.common.exceptions;
 
-import jakarta.annotation.Nullable;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jp.onehr.base.InitTemplateApplication;
@@ -14,12 +13,13 @@ import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.validation.method.ParameterErrors;
-import org.springframework.validation.method.ParameterValidationResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -27,7 +27,10 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.ServletRequestBindingException;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.ModelAndView;
@@ -35,6 +38,8 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -192,53 +197,54 @@ public class GlobalExceptionHandler {
     // 适用参数验证注解 @RequestParam、@PathVariable、@RequestHeader
     @ExceptionHandler(HandlerMethodValidationException.class)
     public Object handlerMethodValidationException(HttpServletRequest request, HandlerMethodValidationException e) {
-        e.visitResults(new HandlerMethodValidationException.Visitor() {
-            @Override
-            public void requestHeader(RequestHeader requestHeader, ParameterValidationResult result) {
-                // 处理 @RequestHeader 参数的验证错误
-                // ...
-            }
-
-            @Override
-            public void requestParam(@Nullable RequestParam requestParam, ParameterValidationResult result) {
-                // 处理 @RequestParam 参数的验证错误
-                // ...
-            }
-
-            @Override
-            public void modelAttribute(@Nullable ModelAttribute modelAttribute, ParameterErrors errors) {
-                // 处理 @ModelAttribute 参数的验证错误
-                // ...
-            }
-
-            @Override
-            public void other(ParameterValidationResult result) {
-                // 处理其他类型的验证错误
-                // ...
-            }
-        });
-        return null;
+        var errors = new HashMap<String,Object>();
+        var allErrors = e.getAllErrors();
+        var httpStatus = HttpStatus.BAD_REQUEST;
+        for (var error : allErrors) {
+            var args = error.getArguments();
+            var arg0 = (DefaultMessageSourceResolvable)args[0];
+            errors.put(arg0.getDefaultMessage(), error.getDefaultMessage());
+        }
+        if (ServletUtil.isAjaxRequest(request)) {
+            return ResponseEntity.status(HttpStatus.OK.value())
+                    .body(JsonResp
+                            .error(JsonUtil.obj2Json(errors))
+                            .setCode(httpStatus.value())
+                    );
+        } else {
+            return errorView(errors,httpStatus);
+        }
     }
 
     // 触发条件 @Valid校验失败
     // 适用数验证注解 @RequestBody、@ModelAttribute
-    @ExceptionHandler({MethodArgumentNotValidException.class})
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public Object methodArgumentNotValidException(HttpServletRequest request, MethodArgumentNotValidException e) {
-        e.getBindingResult().getFieldErrors().forEach(error ->
-                System.out.println(error.getField()+"->"+error.getDefaultMessage())
-        );
-        return null;
+        var errors = new HashMap<String,Object>();
+        var allErrors = e.getAllErrors();
+        var httpStatus = HttpStatus.BAD_REQUEST;
+        var unknownErrorNo = 0;
+        for (var error : allErrors) {
+            if (error instanceof FieldError fieldError) {
+                errors.put(fieldError.getField(), fieldError.getDefaultMessage());
+            } else if (error instanceof ObjectError objectError) {
+                errors.put(objectError.getObjectName(), error.getDefaultMessage());
+            } else {
+                unknownErrorNo++;
+                errors.put("unknownError-"+unknownErrorNo,error.getDefaultMessage());
+            }
+        }
+        if (ServletUtil.isAjaxRequest(request)) {
+            return ResponseEntity.status(HttpStatus.OK.value())
+                    .body(JsonResp
+                            .error(SpringUtil.getMessage("error_invalid_request_parameters"))
+                            .setData(errors)
+                            .setCode(httpStatus.value())
+                    );
+        } else {
+            return errorView(errors,httpStatus);
+        }
     }
-
-//    @Override
-//    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-//        return super.handleMethodArgumentNotValid(ex, headers, status, request);
-//    }
-//
-//    @Override
-//    protected ResponseEntity<Object> handleHandlerMethodValidationException(HandlerMethodValidationException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-//        return super.handleHandlerMethodValidationException(ex, headers, status, request);
-//    }
 
 //    @Override
 //    protected ResponseEntity<Object> handleAsyncRequestTimeoutException(AsyncRequestTimeoutException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
@@ -285,6 +291,14 @@ public class GlobalExceptionHandler {
         var mav = new ModelAndView(viewName);
         mav.setStatus(status);
         mav.addObject("message", message);
+        mav.addObject("status",status.value());
+        return mav;
+    }
+
+    private ModelAndView errorView(Map<String,Object> errors, HttpStatus status) {
+        var mav = new ModelAndView("error");
+        mav.setStatus(status);
+        mav.addObject("errors", errors);
         mav.addObject("status",status.value());
         return mav;
     }

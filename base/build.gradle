@@ -13,7 +13,8 @@ dependencies {
     implementation 'io.github.cdimascio:dotenv-java'
     implementation 'net.logstash.logback:logstash-logback-encoder'
     implementation 'com.google.code.gson:gson'
-    implementation "gg.jte:jte"
+    implementation 'gg.jte:jte'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 

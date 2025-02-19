@@ -1,5 +1,7 @@
 package jp.onehr.base.common.utils;
 
+import jp.onehr.base.common.exceptions.UtilException;
+
 import java.lang.reflect.Constructor;
 
 public class ReflectUtil {
@@ -16,7 +18,23 @@ public class ReflectUtil {
         return beanClass.getDeclaredConstructors();
     }
 
-    // --------------------------------------------------------------------------------------------------------- Field
+    // --------------------------------------------------------------------------------------------------------- newInstance
 
+    /**
+     * 实例化对象
+     *
+     * @param <T>   对象类型
+     * @param clazz 类名
+     * @return 对象
+     * @throws UtilException 包装各类异常
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T newInstance(String clazz) throws UtilException {
+        try {
+            return (T) Class.forName(clazz).getDeclaredConstructor().newInstance();
+        } catch (Exception e) {
+            throw new UtilException(e, "Instance class [{}] error!", clazz);
+        }
+    }
 
 }

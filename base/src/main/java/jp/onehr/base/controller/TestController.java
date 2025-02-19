@@ -1,6 +1,10 @@
 package jp.onehr.base.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jp.onehr.base.common.enums.ExceptionLevel;
 import jp.onehr.base.common.exceptions.AppException;
 import jp.onehr.base.common.utils.SpringUtil;
@@ -115,6 +119,32 @@ public class TestController {
             int a = 1/0;
         }  catch (Exception e){
             throw new AppException(50001,"App error occurred:",true, ExceptionLevel.WARN,e);
+        }
+    }
+
+    @PostMapping("9")
+    public void test9(@Valid @RequestBody ValidDto dto) {
+
+    }
+
+    // http://localhost:8080/10/100?p1=9
+    // 触发HandlerMethodValidationException
+    @GetMapping("10/{a:\\d+}")
+    public void test10(@RequestParam @Min(value = 10, message = "数字必须大于或等于10") int p1,
+                       @PathVariable @Max(value=99, message = "数字必须小于或等于99") int a) {
+
+    }
+
+    public static class ValidDto {
+        @NotBlank(message = "name is blank")
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
         }
     }
 
