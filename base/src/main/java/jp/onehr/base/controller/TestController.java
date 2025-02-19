@@ -104,7 +104,7 @@ public class TestController {
        try {
            int a = 1/0;
        } catch (Exception e) {
-           throw new AppException(e);
+//           throw new AppException(e);
        }
     }
 
@@ -114,7 +114,7 @@ public class TestController {
         try{
             int a = 1/0;
         }  catch (Exception e){
-            throw new AppException(50001, ExceptionLevel.WARN,"App error occurred:",e);
+            throw new AppException(50001,"App error occurred:",true, ExceptionLevel.WARN,e);
         }
     }
 

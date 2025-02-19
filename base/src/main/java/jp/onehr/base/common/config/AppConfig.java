@@ -2,12 +2,11 @@ package jp.onehr.base.common.config;
 
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
-import jp.onehr.base.common.config.properties.SystemProperties;
 import jp.onehr.base.common.config.serializer.LocalDateTimeSerializer;
 import jp.onehr.base.common.config.serializer.ZonedDateTimeSerializer;
 import jp.onehr.base.common.constants.AppConstants;
 import jp.onehr.base.common.filters.EntryPointFilter;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +23,7 @@ import java.time.ZonedDateTime;
 import java.util.List;
 
 @Configuration
-@EnableConfigurationProperties(SystemProperties.class)
+@ConfigurationPropertiesScan
 public class AppConfig implements WebMvcConfigurer {
 
     @Override

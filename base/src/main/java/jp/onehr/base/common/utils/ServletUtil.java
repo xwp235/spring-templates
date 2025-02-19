@@ -12,7 +12,6 @@ import org.springframework.http.MediaType;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -92,47 +91,28 @@ public class ServletUtil {
         var contentLength = request.getContentLength();
         var acceptJson = Objects.nonNull(acceptHeader) && acceptHeader.contains(MediaType.APPLICATION_JSON_VALUE);
         var contentJson = Objects.nonNull(contentType) && StringUtils.equals(contentType, MediaType.APPLICATION_JSON_VALUE) && contentLength > 0;
-        return acceptJson || contentJson;
+        var testTool = Objects.isNull(contentType) && contentLength<0 && Objects.nonNull(acceptHeader) && acceptHeader.contains(MediaType.ALL_VALUE);
+        return acceptJson || contentJson || testTool;
     }
 
     // --------------------------------------------------------- Response start
 
     /**
-     * 获得PrintWriter
+     * 返回数据给客户端
      *
-     * @param response 响应对象{@link HttpServletResponse}
-     * @return 获得PrintWriter
-     * @throws IORuntimeException IO异常
+     * @param response    响应对象{@link HttpServletResponse}
+     * @param text        返回的内容
+     * @param mediaType 返回的类型
      */
-    public static PrintWriter getWriter(HttpServletResponse response) throws IORuntimeException {
-        try {
-            return response.getWriter();
-        } catch (IOException e) {
-            throw new IORuntimeException(e);
+    public static void write(HttpServletResponse response, String text, MediaType mediaType) throws IOException {
+        response.setContentType(mediaType.toString());
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        try (var writer = response.getWriter()) {
+            writer.write(text);
+            writer.flush();
         }
     }
 
-//    /**
-//     * 返回数据给客户端
-//     *
-//     * @param response    响应对象{@link HttpServletResponse}
-//     * @param text        返回的内容
-//     * @param contentType 返回的类型
-//     */
-//    public static void write(HttpServletResponse response, String text, String contentType) {
-//        response.setContentType(contentType);
-//        Writer writer = null;
-//        try {
-//            writer = response.getWriter();
-//            writer.write(text);
-//            writer.flush();
-//        } catch (IOException e) {
-//            throw new UtilException(e);
-//        } finally {
-//            IoUtil.close(writer);
-//        }
-//    }
-//
 //    /**
 //     * 返回文件给客户端
 //     *

@@ -9,84 +9,90 @@ import java.io.Serial;
 public class AppException extends StatefulException {
 
     private final ExceptionLevel level;
+    private final boolean shouldLog;
 
     @Serial
     private static final long serialVersionUID = 6057602589533840890L;
 
-    public AppException() {
+    public AppException(boolean shouldLog) {
         super(StatusCodeConstants.SERVER_INTERNAL_ERROR,
                 SpringUtil.getMessage("serverInternalError"),null, false, false);
-        level = ExceptionLevel.ERROR;
+        this.level = ExceptionLevel.ERROR;
+        this.shouldLog = shouldLog;
     }
 
-    public AppException(Throwable throwable) {
+    public AppException(boolean shouldLog, Throwable throwable) {
         super(StatusCodeConstants.SERVER_INTERNAL_ERROR,
                 SpringUtil.getMessage("serverInternalError"), throwable, false, false);
-        level = ExceptionLevel.ERROR;
+        this.level = ExceptionLevel.ERROR;
+        this.shouldLog = shouldLog;
     }
 
-    public AppException(int code, ExceptionLevel level, Throwable throwable) {
+    public AppException(int code, boolean shouldLog,ExceptionLevel level, Throwable throwable) {
         super(code, SpringUtil.getMessage("serverInternalError"), throwable, false, false);
         this.level = level;
+        this.shouldLog = shouldLog;
     }
 
-    public AppException(int code, ExceptionLevel level) {
+    public AppException(int code, boolean shouldLog, ExceptionLevel level) {
         super(code, SpringUtil.getMessage("serverInternalError"), null, false, false);
         this.level = level;
+        this.shouldLog = shouldLog;
     }
 
-    public AppException(int code, ExceptionLevel level, String message, Throwable throwable) {
+    public AppException(int code, String message, boolean shouldLog, ExceptionLevel level, Throwable throwable) {
         super(code,message, throwable, false, false);
         this.level = level;
+        this.shouldLog = shouldLog;
     }
 
-    public AppException(int code, ExceptionLevel level, String message) {
+    public AppException(int code,String message, boolean shouldLog, ExceptionLevel level) {
         super(code,message, null, false, false);
         this.level = level;
+        this.shouldLog = shouldLog;
     }
 
-    public AppException(ExceptionLevel level, String message, Throwable throwable) {
-        super(StatusCodeConstants.SERVER_INTERNAL_ERROR, message, throwable, false, false);
-        this.level = level;
-    }
-
-    public AppException(ExceptionLevel level, String message) {
+    public AppException(String message,boolean shouldLog, ExceptionLevel level) {
         super(StatusCodeConstants.SERVER_INTERNAL_ERROR, message, null, false, false);
         this.level = level;
+        this.shouldLog = shouldLog;
     }
 
-    public AppException(String message, ExceptionLevel level, Throwable throwable) {
+    public AppException(String message, boolean shouldLog, ExceptionLevel level, Throwable throwable) {
         super(StatusCodeConstants.SERVER_INTERNAL_ERROR, message, throwable, false, false);
         this.level = level;
+        this.shouldLog = shouldLog;
     }
 
-    public AppException(String message, ExceptionLevel level) {
-        super(StatusCodeConstants.SERVER_INTERNAL_ERROR, message, null, false, false);
-        this.level = level;
-    }
 
-    public AppException(String message, Throwable throwable) {
+    public AppException(String message, boolean shouldLog, Throwable throwable) {
         super(StatusCodeConstants.SERVER_INTERNAL_ERROR, message, throwable, false, false);
         this.level = ExceptionLevel.ERROR;
-    }
-
-    public AppException(String message) {
-        super(StatusCodeConstants.SERVER_INTERNAL_ERROR, message, null, false, false);
-        this.level = ExceptionLevel.ERROR;
+        this.shouldLog = shouldLog;
     }
 
     public AppException(int code, String message, Throwable throwable) {
         super(code, message, throwable, false, false);
         this.level = ExceptionLevel.ERROR;
+        this.shouldLog = true;
     }
 
-    public AppException(int code, String message) {
+    public AppException(int code, String message, boolean shouldLog) {
         super(code, message, null, false, false);
-        this.level = ExceptionLevel.ERROR;
+        this.shouldLog = shouldLog;
+        if(shouldLog) {
+            this.level = ExceptionLevel.ERROR;
+        } else {
+            this.level = ExceptionLevel.INFO;
+        }
     }
 
     public ExceptionLevel getLevel() {
         return this.level;
+    }
+
+    public boolean shouldLog() {
+        return this.shouldLog;
     }
 
 }
