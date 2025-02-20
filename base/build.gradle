@@ -15,6 +15,7 @@ dependencies {
     implementation 'com.google.code.gson:gson'
     implementation 'gg.jte:jte'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.apache.commons:commons-fileupload2-jakarta-servlet6'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 

@@ -2,6 +2,7 @@ package jp.onehr.base.common.exceptions;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jp.onehr.base.InitTemplateApplication;
 import jp.onehr.base.common.enums.ExceptionLevel;
@@ -11,17 +12,21 @@ import jp.onehr.base.common.utils.ServletUtil;
 import jp.onehr.base.common.utils.SpringUtil;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.TypeMismatchException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.util.unit.DataSize;
+import org.springframework.util.unit.DataUnit;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
-import org.springframework.validation.method.MethodValidationException;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -33,9 +38,9 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
@@ -58,6 +63,9 @@ import java.util.Objects;
 public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @Value("${spring.servlet.multipart.max-file-size}")
+    private DataSize maxFileSize;
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public Object httpRequestMethodNotSupportedException(HttpServletRequest request) {
@@ -105,9 +113,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    public Object httpMediaTypeNotSupportedException(HttpServletRequest request) {
+    public Object httpMediaTypeNotSupportedException(HttpServletRequest request, HttpMediaTypeNotSupportedException e) {
         var httpStatus = HttpStatus.UNSUPPORTED_MEDIA_TYPE;
         var message = SpringUtil.getMessage("error_request_media_type_not_supported");
+
         if (ServletUtil.isAjaxRequest(request)) {
             return ResponseEntity.status(HttpStatus.OK.value())
                     .body(JsonResp
@@ -168,12 +177,18 @@ public class GlobalExceptionHandler {
         }
     }
 
-    @ExceptionHandler({MissingServletRequestPartException.class,MissingServletRequestParameterException.class,
-            HttpMessageNotReadableException.class, MissingPathVariableException.class,
-            ServletRequestBindingException.class})
-    public Object clientRequestException(HttpServletRequest request) {
+    @ExceptionHandler({
+            MissingServletRequestPartException.class,
+            MissingServletRequestParameterException.class,
+            HttpMessageNotReadableException.class,
+            MissingPathVariableException.class,
+            ServletRequestBindingException.class,
+            TypeMismatchException.class
+    })
+    public Object clientRequestException(HttpServletRequest request, Exception e) {
         var message = SpringUtil.getMessage("error_invalid_request_parameters");
         var httpStatus = HttpStatus.BAD_REQUEST;
+        printDevLog(message, e);
         if (ServletUtil.isAjaxRequest(request)) {
             return ResponseEntity.status(HttpStatus.OK.value())
                     .body(JsonResp
@@ -270,35 +285,46 @@ public class GlobalExceptionHandler {
     // service类上加@Validated，方法参数上加验证注解时抛出
     @ExceptionHandler(ConstraintViolationException.class)
     public Object constraintViolationException(HttpServletRequest request,ConstraintViolationException e) {
-        System.out.println(e);
-          return null;
+        var errors = new HashMap<String,Object>();
+        var httpStatus = HttpStatus.BAD_REQUEST;
+        for (ConstraintViolation<?> constraintViolation : e.getConstraintViolations()) {
+            var className = constraintViolation.getRootBeanClass().getName();
+            var fieldPath = constraintViolation.getPropertyPath();
+            var message = constraintViolation.getMessage();
+            errors.put(className+'@'+fieldPath,message);
+        }
+
+        var message = SpringUtil.getMessage("error_invalid_server_request_parameters");
+        printDevLog(message, e);
+        if (ServletUtil.isAjaxRequest(request)) {
+            var resp = JsonResp
+                    .error(message)
+                    .setCode(httpStatus.value());
+            var activeProfile = SpringUtil.getActiveProfile();
+            var isDev = StringUtils.equalsIgnoreCase("dev",activeProfile);
+            if (isDev) {
+                resp.setData(errors);
+            }
+            return ResponseEntity.status(HttpStatus.OK.value()).body(resp);
+        } else {
+            return errorView(errors,httpStatus);
+        }
     }
 
-//    @Override
-//    protected ResponseEntity<Object> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-//        return super.handleMaxUploadSizeExceededException(ex, headers, status, request);
-//    }
-//
-//    @Override
-//    protected ResponseEntity<Object> handleConversionNotSupported(ConversionNotSupportedException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-//        return super.handleConversionNotSupported(ex, headers, status, request);
-//    }
-//
-//    @Override
-//    protected ResponseEntity<Object> handleTypeMismatch(TypeMismatchException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-//        return super.handleTypeMismatch(ex, headers, status, request);
-//    }
-
-//    @Override
-//    protected ResponseEntity<Object> handleHttpMessageNotWritable(HttpMessageNotWritableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-//        return super.handleHttpMessageNotWritable(ex, headers, status, request);
-//    }
-
-//    @Override
-//    protected ResponseEntity<Object> handleAsyncRequestNotUsableException(AsyncRequestNotUsableException ex, WebRequest request) {
-//        return super.handleAsyncRequestNotUsableException(ex, request);
-//    }
-
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public Object maxUploadSizeExceededException(HttpServletRequest request) {
+        var httpStatus = HttpStatus.BAD_REQUEST;
+        var message = SpringUtil.getMessage("error_upload_file_too_large",maxFileSize.toKilobytes()+"KB");
+        if (ServletUtil.isAjaxRequest(request)) {
+            return ResponseEntity.status(HttpStatus.OK.value())
+                    .body(JsonResp
+                            .error(message)
+                            .setCode(httpStatus.value())
+                    );
+        } else {
+            return errorView("error", message,httpStatus);
+        }
+    }
 
     private ModelAndView errorView(String viewName, String message,HttpStatus status) {
         var mav = new ModelAndView(viewName);
@@ -339,6 +365,14 @@ public class GlobalExceptionHandler {
             }
         }
         return new RootErrorInfo(info.getLineNumber(),info.getClassName(),info.getMethodName());
+    }
+
+    private void printDevLog(String message,Exception e) {
+        var activeProfile = SpringUtil.getActiveProfile();
+        var isDev = StringUtils.equalsIgnoreCase("dev",activeProfile);
+        if (isDev) {
+            logger.error(message,e);
+        }
     }
 
 }

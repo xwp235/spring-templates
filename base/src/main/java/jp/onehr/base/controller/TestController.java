@@ -186,6 +186,18 @@ public class TestController {
         }
     }
 
+    @GetMapping("12")
+    public String test12(@RequestParam Integer id) {
+        return "ID: " + id;
+    }
+
+    @PostMapping("13")
+    public void test13(@RequestPart MultipartFile file,
+                       @RequestPart String a1) {
+        System.out.println(file);
+        System.out.println(a1);
+    }
+
     public static class Person {
         private Integer pid;
         private String pname;

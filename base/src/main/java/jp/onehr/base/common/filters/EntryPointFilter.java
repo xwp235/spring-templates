@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jp.onehr.base.common.config.ReusableHttpServletRequestWrapper;
 import jp.onehr.base.common.constants.AppConstants;
 import jp.onehr.base.common.utils.ServletUtil;
+import org.apache.commons.fileupload2.jakarta.servlet6.JakartaServletFileUpload;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.MDC;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -26,7 +27,9 @@ public class EntryPointFilter extends OncePerRequestFilter {
         try {
             MDC.put(AppConstants.MDC.LOG_ID, logId);
             ServletUtil.setHeader(response, AppConstants.X_REQUESTED_ID, logId);
-            if (!ServletUtil.isGetMethod(request) && ServletUtil.isAjaxRequest(request)) {
+            if (!ServletUtil.isGetMethod(request) &&
+                    !JakartaServletFileUpload.isMultipartContent(request) &&
+                    ServletUtil.isAjaxRequest(request)) {
                 filterChain.doFilter(new ReusableHttpServletRequestWrapper(request), response);
             } else {
                 filterChain.doFilter(request, response);
