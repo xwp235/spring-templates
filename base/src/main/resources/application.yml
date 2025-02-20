@@ -42,6 +42,8 @@ spring:
     keep-alive: on
   mvc:
     log-request-details: on
+    async:
+      request-timeout: ${ASYNC_REQUEST_TIMEOUT:PT3S}
     # spring-boot 2.2版本后要手动开启form的_method对delete和put的处理
     hiddenmethod:
       filter:

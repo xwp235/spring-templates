@@ -2,6 +2,7 @@ package jp.onehr.base.common.exceptions;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.ConstraintViolationException;
 import jp.onehr.base.InitTemplateApplication;
 import jp.onehr.base.common.enums.ExceptionLevel;
 import jp.onehr.base.common.resp.JsonResp;
@@ -20,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.validation.method.MethodValidationException;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -31,6 +33,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.ModelAndView;
@@ -131,6 +135,8 @@ public class GlobalExceptionHandler {
             } else {
                 message = SpringUtil.getMessage("appWarningOccurred");
             }
+        } else {
+             message = rootErrorInfo.toString();
         }
         if (e.shouldLog()) {
             if (level == ExceptionLevel.ERROR || level == ExceptionLevel.FATAL) {
@@ -155,6 +161,7 @@ public class GlobalExceptionHandler {
                     .body(JsonResp
                             .error(message)
                             .setCode(httpStatus.value())
+                            .setExceptionTypeWithTraceId(ExceptionLevel.ERROR)
                     );
         } else {
             return errorView("error", message,httpStatus);
@@ -223,15 +230,11 @@ public class GlobalExceptionHandler {
         var errors = new HashMap<String,Object>();
         var allErrors = e.getAllErrors();
         var httpStatus = HttpStatus.BAD_REQUEST;
-        var unknownErrorNo = 0;
         for (var error : allErrors) {
             if (error instanceof FieldError fieldError) {
-                errors.put(fieldError.getField(), fieldError.getDefaultMessage());
+                errors.put("field-"+fieldError.getField(), fieldError.getDefaultMessage());
             } else if (error instanceof ObjectError objectError) {
-                errors.put(objectError.getObjectName(), error.getDefaultMessage());
-            } else {
-                unknownErrorNo++;
-                errors.put("unknownError-"+unknownErrorNo,error.getDefaultMessage());
+                errors.put("validator-"+objectError.getObjectName(), error.getDefaultMessage());
             }
         }
         if (ServletUtil.isAjaxRequest(request)) {
@@ -246,16 +249,31 @@ public class GlobalExceptionHandler {
         }
     }
 
-//    @Override
-//    protected ResponseEntity<Object> handleAsyncRequestTimeoutException(AsyncRequestTimeoutException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-//        return super.handleAsyncRequestTimeoutException(ex, headers, status, request);
-//    }
-//
-//    @Override
-//    protected ResponseEntity<Object> handleErrorResponseException(ErrorResponseException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-//        return super.handleErrorResponseException(ex, headers, status, request);
-//    }
-//
+    // 使用了DeferredResult或WebAsyncTask作为返回时才会触发
+    @ExceptionHandler(AsyncRequestTimeoutException.class)
+    public Object asyncRequestTimeoutException(HttpServletRequest request, AsyncRequestTimeoutException e) {
+        var message = e.getMessage();
+        var httpStatus = HttpStatus.REQUEST_TIMEOUT;
+        logger.error(message, e);
+        if (ServletUtil.isAjaxRequest(request)) {
+            return ResponseEntity.status(HttpStatus.OK.value())
+                    .body(JsonResp
+                            .error(message)
+                            .setCode(httpStatus.value())
+                            .setExceptionTypeWithTraceId(ExceptionLevel.ERROR)
+                    );
+        } else {
+            return errorView("error", message,httpStatus);
+        }
+    }
+
+    // service类上加@Validated，方法参数上加验证注解时抛出
+    @ExceptionHandler(ConstraintViolationException.class)
+    public Object constraintViolationException(HttpServletRequest request,ConstraintViolationException e) {
+        System.out.println(e);
+          return null;
+    }
+
 //    @Override
 //    protected ResponseEntity<Object> handleMaxUploadSizeExceededException(MaxUploadSizeExceededException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 //        return super.handleMaxUploadSizeExceededException(ex, headers, status, request);
@@ -275,12 +293,7 @@ public class GlobalExceptionHandler {
 //    protected ResponseEntity<Object> handleHttpMessageNotWritable(HttpMessageNotWritableException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
 //        return super.handleHttpMessageNotWritable(ex, headers, status, request);
 //    }
-//
-//    @Override
-//    protected ResponseEntity<Object> handleMethodValidationException(MethodValidationException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-//        return super.handleMethodValidationException(ex, headers, status, request);
-//    }
-//
+
 //    @Override
 //    protected ResponseEntity<Object> handleAsyncRequestNotUsableException(AsyncRequestNotUsableException ex, WebRequest request) {
 //        return super.handleAsyncRequestNotUsableException(ex, request);

@@ -34,7 +34,7 @@ public class JteConfig {
             // Here, a JTE file watcher will recompile the JTE templates upon file save (the web browser will auto-refresh)
             // If using IntelliJ, use Ctrl-F9 to trigger an auto-refresh when editing non-JTE files.
             var codeResolver = new DirectoryCodeResolver(Path.of("base","src", "main","resources","templates"));
-            var templateEngine = TemplateEngine.create(codeResolver, Paths.get("jte-classes"), ContentType.Html, getClass().getClassLoader());
+            var templateEngine = TemplateEngine.create(codeResolver, Paths.get("base/jte-classes"), ContentType.Html, getClass().getClassLoader());
             templateEngine.setBinaryStaticContent(true);
             return templateEngine;
         }

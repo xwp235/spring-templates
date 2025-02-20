@@ -8,15 +8,20 @@ import jakarta.validation.constraints.NotBlank;
 import jp.onehr.base.common.enums.ExceptionLevel;
 import jp.onehr.base.common.exceptions.AppException;
 import jp.onehr.base.common.utils.SpringUtil;
+import org.hibernate.validator.constraints.ScriptAssert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
+import org.springframework.web.context.request.async.DeferredResult;
+import org.springframework.web.context.request.async.WebAsyncTask;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Map;
+import java.util.concurrent.*;
 
 @RestController
 public class TestController {
@@ -135,16 +140,49 @@ public class TestController {
 
     }
 
-    public static class ValidDto {
-        @NotBlank(message = "name is blank")
-        private String name;
+    @GetMapping("11")
+    public void test11() {
+//        userService.getUserById(null);
+        userService.createProduct(new Product("", 0));
+    }
 
-        public String getName() {
-            return name;
-        }
+    @GetMapping("async/1")
+    public WebAsyncTask<String> async1() {
+        WebAsyncTask<String> task = new WebAsyncTask<>(2000L, () -> {
+            Thread.sleep(5000); // 模拟长时间处理
+            return "Success";
+        });
 
-        public void setName(String name) {
-            this.name = name;
+        // 设置超时回调，手动抛出异常
+        task.onTimeout(() -> {
+            throw new AsyncRequestTimeoutException();
+        });
+        return task;
+    }
+
+    @GetMapping("async/2")
+    public DeferredResult<String> async2() {
+        DeferredResult<String> deferredResult = new DeferredResult<>(2000L); // 2 秒超时
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(5000); // 模拟长时间处理
+                deferredResult.setResult("Success");
+            } catch (InterruptedException e) {
+                deferredResult.setErrorResult("Error");
+            }
+        }).start();
+
+        return deferredResult;
+    }
+
+    @GetMapping("async/3")
+    public String async3() {
+        try {
+            // 设置超时时间（2 秒）
+            return userService.longRunningTask().get(10, TimeUnit.SECONDS);
+        }  catch (TimeoutException|InterruptedException | ExecutionException e) {
+            return "Error: " + e.getMessage();
         }
     }
 
