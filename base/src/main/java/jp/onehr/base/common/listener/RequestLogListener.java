@@ -1,7 +1,6 @@
 package jp.onehr.base.common.listener;
 
 import org.springframework.context.ApplicationListener;
-import org.springframework.stereotype.Component;
 import org.springframework.web.context.support.ServletRequestHandledEvent;
 
 import java.util.Objects;
@@ -12,7 +11,7 @@ public class RequestLogListener implements ApplicationListener<ServletRequestHan
     @Override
     public void onApplicationEvent(ServletRequestHandledEvent event) {
         var error = event.getFailureCause();
-        if (Objects.nonNull(error)){
+        if (Objects.nonNull(error)) {
             System.err.printf("error: %s\n", error.getMessage());
         }
         System.out.println("==================>");

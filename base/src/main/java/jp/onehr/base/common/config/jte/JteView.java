@@ -11,7 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 public class JteView extends AbstractTemplateView {
-
+    
     private final TemplateEngine templateEngine;
 
     public JteView(TemplateEngine templateEngine) {

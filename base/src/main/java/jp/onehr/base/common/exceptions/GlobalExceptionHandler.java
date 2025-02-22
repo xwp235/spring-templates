@@ -24,7 +24,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.util.unit.DataSize;
-import org.springframework.util.unit.DataUnit;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
@@ -52,7 +51,6 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- *
  * status：服务器生成的 HTTP 状态代码。
  * type：一个用于标识问题类型及如何解决该问题的URL。默认值为"about:blank"。
  * title：问题的简短描述。
@@ -78,7 +76,7 @@ public class GlobalExceptionHandler {
                             .setCode(httpStatus.value())
                     );
         } else {
-            return errorView("error", message,httpStatus);
+            return errorView("error", message, httpStatus);
         }
     }
 
@@ -90,7 +88,7 @@ public class GlobalExceptionHandler {
             var json = JsonUtil.obj2Json(JsonResp
                     .error(message)
                     .setCode(httpStatus.value()));
-            ServletUtil.write(response,json, MediaType.APPLICATION_JSON);
+            ServletUtil.write(response, json, MediaType.APPLICATION_JSON);
         } else {
             response.setStatus(httpStatus.value());
             response.sendRedirect("/404");
@@ -124,7 +122,7 @@ public class GlobalExceptionHandler {
                             .setCode(httpStatus.value())
                     );
         } else {
-            return errorView("error", message,httpStatus);
+            return errorView("error", message, httpStatus);
         }
     }
 
@@ -139,13 +137,13 @@ public class GlobalExceptionHandler {
         var message = e.getMessage();
         var level = e.getLevel();
         if (Objects.isNull(rootErrorInfo)) {
-            if (level==ExceptionLevel.ERROR||level==ExceptionLevel.FATAL) {
+            if (level == ExceptionLevel.ERROR || level == ExceptionLevel.FATAL) {
                 message = SpringUtil.getMessage("appErrorOccurred");
             } else {
                 message = SpringUtil.getMessage("appWarningOccurred");
             }
         } else {
-             message = rootErrorInfo.toString();
+            message = rootErrorInfo.toString();
         }
         if (e.shouldLog()) {
             if (level == ExceptionLevel.ERROR || level == ExceptionLevel.FATAL) {
@@ -161,7 +159,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public Object exception(Exception e,HttpServletRequest request) {
+    public Object exception(Exception e, HttpServletRequest request) {
         var message = SpringUtil.getMessage("serverInternalError");
         var httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
         logger.error(message, e);
@@ -173,7 +171,7 @@ public class GlobalExceptionHandler {
                             .setExceptionTypeWithTraceId(ExceptionLevel.ERROR)
                     );
         } else {
-            return errorView("error", message,httpStatus);
+            return errorView("error", message, httpStatus);
         }
     }
 
@@ -196,7 +194,7 @@ public class GlobalExceptionHandler {
                             .setCode(httpStatus.value())
                     );
         } else {
-            return errorView("error", message,httpStatus);
+            return errorView("error", message, httpStatus);
         }
     }
 
@@ -211,7 +209,7 @@ public class GlobalExceptionHandler {
                             .setCode(httpStatus.value())
                     );
         } else {
-            return errorView("error", message,httpStatus);
+            return errorView("error", message, httpStatus);
         }
     }
 
@@ -219,12 +217,12 @@ public class GlobalExceptionHandler {
     // 适用参数验证注解 @RequestParam、@PathVariable、@RequestHeader
     @ExceptionHandler(HandlerMethodValidationException.class)
     public Object handlerMethodValidationException(HttpServletRequest request, HandlerMethodValidationException e) {
-        var errors = new HashMap<String,Object>();
+        var errors = new HashMap<String, Object>();
         var allErrors = e.getAllErrors();
         var httpStatus = HttpStatus.BAD_REQUEST;
         for (var error : allErrors) {
             var args = error.getArguments();
-            var arg0 = (DefaultMessageSourceResolvable)args[0];
+            var arg0 = (DefaultMessageSourceResolvable) args[0];
             errors.put(arg0.getDefaultMessage(), error.getDefaultMessage());
         }
         if (ServletUtil.isAjaxRequest(request)) {
@@ -234,7 +232,7 @@ public class GlobalExceptionHandler {
                             .setCode(httpStatus.value())
                     );
         } else {
-            return errorView(errors,httpStatus);
+            return errorView(errors, httpStatus);
         }
     }
 
@@ -242,14 +240,14 @@ public class GlobalExceptionHandler {
     // 适用数验证注解 @RequestBody、@ModelAttribute
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public Object methodArgumentNotValidException(HttpServletRequest request, MethodArgumentNotValidException e) {
-        var errors = new HashMap<String,Object>();
+        var errors = new HashMap<String, Object>();
         var allErrors = e.getAllErrors();
         var httpStatus = HttpStatus.BAD_REQUEST;
         for (var error : allErrors) {
             if (error instanceof FieldError fieldError) {
-                errors.put("field-"+fieldError.getField(), fieldError.getDefaultMessage());
+                errors.put("field-" + fieldError.getField(), fieldError.getDefaultMessage());
             } else if (error instanceof ObjectError objectError) {
-                errors.put("validator-"+objectError.getObjectName(), error.getDefaultMessage());
+                errors.put("validator-" + objectError.getObjectName(), error.getDefaultMessage());
             }
         }
         if (ServletUtil.isAjaxRequest(request)) {
@@ -260,7 +258,7 @@ public class GlobalExceptionHandler {
                             .setCode(httpStatus.value())
                     );
         } else {
-            return errorView(errors,httpStatus);
+            return errorView(errors, httpStatus);
         }
     }
 
@@ -278,20 +276,20 @@ public class GlobalExceptionHandler {
                             .setExceptionTypeWithTraceId(ExceptionLevel.ERROR)
                     );
         } else {
-            return errorView("error", message,httpStatus);
+            return errorView("error", message, httpStatus);
         }
     }
 
     // service类上加@Validated，方法参数上加验证注解时抛出
     @ExceptionHandler(ConstraintViolationException.class)
-    public Object constraintViolationException(HttpServletRequest request,ConstraintViolationException e) {
-        var errors = new HashMap<String,Object>();
+    public Object constraintViolationException(HttpServletRequest request, ConstraintViolationException e) {
+        var errors = new HashMap<String, Object>();
         var httpStatus = HttpStatus.BAD_REQUEST;
         for (ConstraintViolation<?> constraintViolation : e.getConstraintViolations()) {
             var className = constraintViolation.getRootBeanClass().getName();
             var fieldPath = constraintViolation.getPropertyPath();
             var message = constraintViolation.getMessage();
-            errors.put(className+'@'+fieldPath,message);
+            errors.put(className + '@' + fieldPath, message);
         }
 
         var message = SpringUtil.getMessage("error_invalid_server_request_parameters");
@@ -301,20 +299,20 @@ public class GlobalExceptionHandler {
                     .error(message)
                     .setCode(httpStatus.value());
             var activeProfile = SpringUtil.getActiveProfile();
-            var isDev = StringUtils.equalsIgnoreCase("dev",activeProfile);
+            var isDev = StringUtils.equalsIgnoreCase("dev", activeProfile);
             if (isDev) {
                 resp.setData(errors);
             }
             return ResponseEntity.status(HttpStatus.OK.value()).body(resp);
         } else {
-            return errorView(errors,httpStatus);
+            return errorView(errors, httpStatus);
         }
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)
     public Object maxUploadSizeExceededException(HttpServletRequest request) {
         var httpStatus = HttpStatus.BAD_REQUEST;
-        var message = SpringUtil.getMessage("error_upload_file_too_large",maxFileSize.toKilobytes()+"KB");
+        var message = SpringUtil.getMessage("error_upload_file_too_large", maxFileSize.toKilobytes() + "KB");
         if (ServletUtil.isAjaxRequest(request)) {
             return ResponseEntity.status(HttpStatus.OK.value())
                     .body(JsonResp
@@ -322,23 +320,23 @@ public class GlobalExceptionHandler {
                             .setCode(httpStatus.value())
                     );
         } else {
-            return errorView("error", message,httpStatus);
+            return errorView("error", message, httpStatus);
         }
     }
 
-    private ModelAndView errorView(String viewName, String message,HttpStatus status) {
+    private ModelAndView errorView(String viewName, String message, HttpStatus status) {
         var mav = new ModelAndView(viewName);
         mav.setStatus(status);
         mav.addObject("message", message);
-        mav.addObject("status",status.value());
+        mav.addObject("status", status.value());
         return mav;
     }
 
-    private ModelAndView errorView(Map<String,Object> errors, HttpStatus status) {
+    private ModelAndView errorView(Map<String, Object> errors, HttpStatus status) {
         var mav = new ModelAndView("error");
         mav.setStatus(status);
         mav.addObject("errors", errors);
-        mav.addObject("status",status.value());
+        mav.addObject("status", status.value());
         return mav;
     }
 
@@ -364,14 +362,14 @@ public class GlobalExceptionHandler {
                 break;
             }
         }
-        return new RootErrorInfo(info.getLineNumber(),info.getClassName(),info.getMethodName());
+        return new RootErrorInfo(info.getLineNumber(), info.getClassName(), info.getMethodName());
     }
 
-    private void printDevLog(String message,Exception e) {
+    private void printDevLog(String message, Exception e) {
         var activeProfile = SpringUtil.getActiveProfile();
-        var isDev = StringUtils.equalsIgnoreCase("dev",activeProfile);
+        var isDev = StringUtils.equalsIgnoreCase("dev", activeProfile);
         if (isDev) {
-            logger.error(message,e);
+            logger.error(message, e);
         }
     }
 

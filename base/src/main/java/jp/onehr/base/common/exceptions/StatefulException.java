@@ -20,7 +20,7 @@ public class StatefulException extends RuntimeException {
     public StatefulException(String messageTemplate, Object... params) {
         super(String.format(messageTemplate, params));
     }
-
+    
     public StatefulException(Throwable throwable) {
         super(throwable);
     }

@@ -29,7 +29,7 @@ public class AsyncConfig implements AsyncConfigurer {
 
     @Override
     public AsyncUncaughtExceptionHandler getAsyncUncaughtExceptionHandler() {
-        return (e, method, params) -> logger.error("Async task execute error occurred!",e);
+        return (e, method, params) -> logger.error("Async task execute error occurred!", e);
     }
 
     @Bean

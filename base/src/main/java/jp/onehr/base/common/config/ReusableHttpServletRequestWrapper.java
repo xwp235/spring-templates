@@ -18,11 +18,11 @@ public final class ReusableHttpServletRequestWrapper extends HttpServletRequestW
     public ReusableHttpServletRequestWrapper(HttpServletRequest request) throws IOException {
         super(request);
         var outputRequestStream = new ByteArrayOutputStream();
-        StreamUtils.copy(request.getInputStream(),outputRequestStream);
+        StreamUtils.copy(request.getInputStream(), outputRequestStream);
         var originalBody = outputRequestStream.toString(StandardCharsets.UTF_8);
         requestInputStream = new ByteArrayInputStream(originalBody.getBytes(StandardCharsets.UTF_8));
     }
-
+    
     @Override
     public ServletInputStream getInputStream() {
 

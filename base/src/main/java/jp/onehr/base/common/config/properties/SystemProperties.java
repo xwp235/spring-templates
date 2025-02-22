@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @ConfigurationProperties(prefix = "config")
 public class SystemProperties {
-
+    
     private String defaultTimezone;
     private String defaultDatetimePattern;
     private LoggingProperties logging;

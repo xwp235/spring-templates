@@ -17,7 +17,7 @@ public class ReflectUtil {
     public static Constructor<?>[] getConstructorsDirectly(Class<?> beanClass) throws SecurityException {
         return beanClass.getDeclaredConstructors();
     }
-
+    
     // --------------------------------------------------------------------------------------------------------- newInstance
 
     /**

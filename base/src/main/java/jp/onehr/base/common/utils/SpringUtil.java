@@ -244,18 +244,18 @@ public class SpringUtil implements BeanFactoryPostProcessor, ApplicationContextA
             applicationContext.publishEvent(event);
         }
     }
-
-    public static String getMessage(String key,String ...values) {
+    
+    public static String getMessage(String key, String... values) {
         var locale = LocaleContextHolder.getLocale();
         var messageSource = getBean(MessageSource.class);
         if (values.length > 0) {
-            return messageSource.getMessage(key,values, locale);
+            return messageSource.getMessage(key, values, locale);
         }
-        return messageSource.getMessage(key,new Object[]{}, locale);
+        return messageSource.getMessage(key, new Object[]{}, locale);
     }
 
     public static String getLocale() {
-        var localeStr =  LocaleContextHolder.getLocale().toString();
+        var localeStr = LocaleContextHolder.getLocale().toString();
         if (StringUtils.isBlank(localeStr)) {
             return "en";
         }
@@ -265,7 +265,7 @@ public class SpringUtil implements BeanFactoryPostProcessor, ApplicationContextA
     public static void restartApp() {
         try (var executor = Executors.newSingleThreadScheduledExecutor()) {
             executor.schedule(SpringUtil::internalRestartApp, 1, TimeUnit.SECONDS);
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new UtilException("Failed to restart the application.", e);
         }
     }
@@ -275,8 +275,8 @@ public class SpringUtil implements BeanFactoryPostProcessor, ApplicationContextA
             var useDefaultConfigFilepath = false;
             if (args.length == 0) {
                 useDefaultConfigFilepath = true;
-                args = new String[] {
-                  System.getProperty("user.dir")
+                args = new String[]{
+                        System.getProperty("user.dir")
                 };
             }
             var configFilePath = args[0];

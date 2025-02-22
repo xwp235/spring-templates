@@ -4,9 +4,10 @@ import jp.onehr.base.common.utils.SpringUtil;
 
 public class RootErrorInfo {
 
-    public RootErrorInfo() {}
+    public RootErrorInfo() {
+    }
 
-    public RootErrorInfo(Integer lineNumber,String className,String methodName) {
+    public RootErrorInfo(Integer lineNumber, String className, String methodName) {
         this.lineNumber = lineNumber;
         this.className = className;
         this.methodName = methodName;
@@ -42,6 +43,6 @@ public class RootErrorInfo {
 
     @Override
     public String toString() {
-        return SpringUtil.getMessage("error_root_error_position", className,methodName,lineNumber+"");
+        return SpringUtil.getMessage("error_root_error_position", className, methodName, lineNumber + "");
     }
 }

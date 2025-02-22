@@ -75,7 +75,7 @@ public class ServletUtil {
      * @return 获得请求体byte[]
      */
     public static byte[] getBodyBytes(ServletRequest request) {
-        try (var in = request.getInputStream()){
+        try (var in = request.getInputStream()) {
             return IOUtils.toByteArray(in);
         } catch (IOException e) {
             throw new IORuntimeException(e);
@@ -91,7 +91,7 @@ public class ServletUtil {
         var contentLength = request.getContentLength();
         var acceptJson = Objects.nonNull(acceptHeader) && acceptHeader.contains(MediaType.APPLICATION_JSON_VALUE);
         var contentJson = Objects.nonNull(contentType) && StringUtils.equals(contentType, MediaType.APPLICATION_JSON_VALUE) && contentLength > 0;
-        var testTool = StringUtils.equals(acceptHeader,MediaType.ALL_VALUE);
+        var testTool = StringUtils.equals(acceptHeader, MediaType.ALL_VALUE);
         return acceptJson || contentJson || testTool;
     }
 
@@ -100,8 +100,8 @@ public class ServletUtil {
     /**
      * 返回数据给客户端
      *
-     * @param response    响应对象{@link HttpServletResponse}
-     * @param text        返回的内容
+     * @param response  响应对象{@link HttpServletResponse}
+     * @param text      返回的内容
      * @param mediaType 返回的类型
      */
     public static void write(HttpServletResponse response, String text, MediaType mediaType) throws IOException {

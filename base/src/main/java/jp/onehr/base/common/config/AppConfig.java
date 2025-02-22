@@ -76,12 +76,12 @@ public class AppConfig implements WebMvcConfigurer {
         configuration.setAllowedHeaders(List.of(CorsConfiguration.ALL));
         // 是否允许发送 Cookie
         configuration.setAllowCredentials(true);
-        configuration.setExposedHeaders(List.of(AppConstants.X_AUTHENTICATE,AppConstants.X_REQUESTED_ID));
+        configuration.setExposedHeaders(List.of(AppConstants.X_AUTHENTICATE, AppConstants.X_REQUESTED_ID));
         // 一小时内不再需要预检（发送OPTIONS请求）
         configuration.setMaxAge(3600L);
         // 配置路径匹配策略
         var source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**",configuration);
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 

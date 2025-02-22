@@ -33,7 +33,7 @@ public class ValidateException extends StatefulException {
     public ValidateException(int status, Throwable throwable) {
         super(status, throwable);
     }
-
+    
     public ValidateException(String message, Throwable throwable, boolean enableSuppression, boolean writableStackTrace) {
         super(message, throwable, enableSuppression, writableStackTrace);
     }

@@ -12,5 +12,5 @@ public enum ExceptionLevel {
     public String getLevel() {
         return this.level;
     }
-
+    
 }

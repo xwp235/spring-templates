@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 
 @Component
 public class LocalDateTimeSerializer extends StdSerializer<LocalDateTime> {
-
+    
     private final DateTimeFormatter formatter;
     private final String zoneId;
 

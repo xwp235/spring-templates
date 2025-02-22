@@ -8,8 +8,8 @@ import org.springframework.util.FastByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 异常工具类
@@ -64,13 +64,13 @@ public class ExceptionUtil {
      * 获取指定层的堆栈信息
      *
      * @param fqcn 指定类名为基础
-     * @param i 指定类名的类堆栈相对层数
+     * @param i    指定类名的类堆栈相对层数
      * @return 指定层的堆栈信息
      */
     public static StackTraceElement getStackElement(String fqcn, int i) {
         final StackTraceElement[] stackTraceArray = Thread.currentThread().getStackTrace();
         final int index = ArrayUtil.matchIndex(ele -> StringUtils.equals(fqcn, ele.getClassName()), stackTraceArray);
-        if(index > 0){
+        if (index > 0) {
             return stackTraceArray[index + i];
         }
         return null;
@@ -167,7 +167,7 @@ public class ExceptionUtil {
             }
             return sb.toString();
         } else {
-            if(limit == length){
+            if (limit == length) {
                 return exceptionStr;
             }
             return StringUtils.substringBefore(exceptionStr, limit);

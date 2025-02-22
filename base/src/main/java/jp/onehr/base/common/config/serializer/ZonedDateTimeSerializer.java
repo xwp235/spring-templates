@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 
 @Component
 public class ZonedDateTimeSerializer extends StdSerializer<ZonedDateTime> {
-
+    
     private final DateTimeFormatter formatter;
 
     public ZonedDateTimeSerializer(SystemProperties systemProperties) {

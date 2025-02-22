@@ -7,7 +7,6 @@ import java.util.Objects;
 
 /**
  * IO运行时异常，常用于对IOException的包装
- *
  */
 public class IORuntimeException extends RuntimeException {
 
@@ -33,7 +32,7 @@ public class IORuntimeException extends RuntimeException {
     public IORuntimeException(Throwable throwable, String messageTemplate, Object... params) {
         super(String.format(messageTemplate, params), throwable);
     }
-
+    
     /**
      * 导致这个异常的异常是否是指定类型的异常
      *

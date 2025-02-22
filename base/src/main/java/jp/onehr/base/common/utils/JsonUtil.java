@@ -13,7 +13,7 @@ import org.springframework.beans.BeanUtils;
 import java.util.Objects;
 
 public class JsonUtil {
-
+    
     private static ObjectMapper mapper;
 
     /**
@@ -26,7 +26,7 @@ public class JsonUtil {
         try {
             return getMapper().writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            throw new AppException(StatusCodeConstants.OBJ_SERIALIZE_2_JSON_FAILED, SpringUtil.getMessage("objSerialize2JsonFailed"),e);
+            throw new AppException(StatusCodeConstants.OBJ_SERIALIZE_2_JSON_FAILED, SpringUtil.getMessage("objSerialize2JsonFailed"), e);
         }
     }
 
@@ -43,7 +43,7 @@ public class JsonUtil {
         try {
             return getMapper().writeValueAsString(object);
         } catch (JsonProcessingException e) {
-            throw new AppException(StatusCodeConstants.OBJ_SERIALIZE_2_JSON_FAILED, SpringUtil.getMessage("objSerialize2JsonFailed"),e);
+            throw new AppException(StatusCodeConstants.OBJ_SERIALIZE_2_JSON_FAILED, SpringUtil.getMessage("objSerialize2JsonFailed"), e);
         }
     }
 
@@ -51,10 +51,10 @@ public class JsonUtil {
      * <p>将json字符串反序列化成Java对象</p>
      */
     public static <T> T json2Obj(String json, Class<T> type) {
-        try{
+        try {
             return getMapper().readValue(json, type);
         } catch (JsonProcessingException e) {
-            throw new AppException(StatusCodeConstants.JSON_DESERIALIZE_2_OBJ_FAILED,SpringUtil.getMessage("jsonDeserialize2objFailed"),e);
+            throw new AppException(StatusCodeConstants.JSON_DESERIALIZE_2_OBJ_FAILED, SpringUtil.getMessage("jsonDeserialize2objFailed"), e);
         }
     }
 
@@ -64,10 +64,10 @@ public class JsonUtil {
      * 可以使用这个方法</p>
      */
     public static <T> T json2Obj(String json, TypeReference<T> valueTypeRef) {
-        try{
+        try {
             return getMapper().readValue(json, valueTypeRef);
         } catch (JsonProcessingException e) {
-            throw new AppException(StatusCodeConstants.JSON_DESERIALIZE_2_OBJ_FAILED,SpringUtil.getMessage("jsonDeserialize2objFailed"),e);
+            throw new AppException(StatusCodeConstants.JSON_DESERIALIZE_2_OBJ_FAILED, SpringUtil.getMessage("jsonDeserialize2objFailed"), e);
         }
     }
 
@@ -85,7 +85,7 @@ public class JsonUtil {
 
     // 合并单个 JSON 对象
     public static JsonNode merge(JsonNode mainNode, JsonNode updateNode) {
-        if (mainNode !=null && mainNode.isObject() && updateNode!=null && updateNode.isObject()) {
+        if (mainNode != null && mainNode.isObject() && updateNode != null && updateNode.isObject()) {
             var mainObject = (ObjectNode) mainNode;
             var updateObject = (ObjectNode) updateNode;
             updateObject.fields().forEachRemaining(entry -> {
@@ -119,7 +119,7 @@ public class JsonUtil {
         try {
             return getMapper().readTree(getMapper().writeValueAsString(original));
         } catch (JsonProcessingException e) {
-            throw new AppException(StatusCodeConstants.DEEP_COPY_OBJ_FAILED,SpringUtil.getMessage("deepCopyObjFailed"),e);
+            throw new AppException(StatusCodeConstants.DEEP_COPY_OBJ_FAILED, SpringUtil.getMessage("deepCopyObjFailed"), e);
         }
     }
 
