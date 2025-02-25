@@ -3,7 +3,7 @@ import org.apache.tools.ant.filters.ReplaceTokens
 // 编译脚本
 buildscript {
     ext {
-        springBootVersion = "3.4.2"
+        springBootVersion = "3.4.3"
     }
     // 仓库配置
     repositories {

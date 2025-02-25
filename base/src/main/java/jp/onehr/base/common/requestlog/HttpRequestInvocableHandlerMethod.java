@@ -1,5 +1,7 @@
 package jp.onehr.base.common.requestlog;
 
+import jp.onehr.base.common.constants.AppConstants;
+import org.slf4j.MDC;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.method.HandlerMethod;
@@ -16,11 +18,12 @@ public class HttpRequestInvocableHandlerMethod extends ServletInvocableHandlerMe
 
     @Override
     public Object doInvoke(Object... args) throws Exception {
-        var attr = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes() ;
+        var attr = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         // 获取当前的请求URI
+        var logId = MDC.get(AppConstants.MDC.LOG_ID);
         var url = attr.getRequest().getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
-        System.err.printf("-------------请求URI：%s-------------%n", url) ;
-        System.out.printf("请求参数: %s%n", Arrays.toString(args)) ;
+        System.err.printf("-------------请求URI：%s-------------%n", url);
+        System.out.printf("请求参数: %s%n", Arrays.toString(args));
         // 该方法才是真正调用目标Controller中的方法
         Object ret = super.doInvoke(args);
         System.out.printf("响应结果: %s%n", ret);

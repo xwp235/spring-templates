@@ -8,6 +8,7 @@ description="Base"
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
     implementation 'org.apache.commons:commons-lang3'
     implementation 'commons-io:commons-io'
     implementation 'io.github.cdimascio:dotenv-java'

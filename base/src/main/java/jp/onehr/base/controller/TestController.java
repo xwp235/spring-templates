@@ -197,6 +197,18 @@ public class TestController {
         System.out.println(a1);
     }
 
+    @PostMapping("14")
+    public void test14(@RequestPart MultipartFile file, @RequestPart String a1) {
+        userService.testAudit(file, a1);
+        System.out.println(file);
+        System.out.println(a1);
+    }
+
+    @PostMapping("15")
+    public void test15(@RequestBody User user) {
+        System.out.println(user);
+    }
+
     public static class Person {
         private Integer pid;
         private String pname;
