@@ -27,7 +27,7 @@ gradle build --warning-mode all
 #### 打包后的jar启动命令
 
 ```bash
-java -Dspring.profiles.active=dev -Duser.timezone=UTC -Dfile.encoding=UTF-8 -jar base-1.0.0.jar D:\GithubRepos\spring-templates\base\env
+java -Dspring.profiles.active=prod -Duser.timezone=UTC -Dfile.encoding=UTF-8 -jar base-1.0.0.jar D:\GithubRepos\spring-templates\base\env
 ```
 
 #### 当前项目支持配置
@@ -41,10 +41,20 @@ LOG_PATH=D:\logs
 APP_TIMEZONE=UTC
 # 项目使用的默认日期格式
 APP_DATETIME_PATTERN=yyyy-MM-dd'T'HH:mm:ss.SSSZ
-# 日志文件中的日期时区
+# 日志显示时间所用时区
 LOG_TIMEZONE=Asia/Tokyo
-# 异步任务执行超时时间
+# 异步任务执行超时时间(使用DeferredResult作为返回值使用时有效)
 ASYNC_REQUEST_TIMEOUT=PT5S
+# 数据库连接地址
+DB_URL=jdbc:postgresql://127.0.0.1:5432/elegant_api?stringtype=unspecified&timezone=UTC&jvmZone=UTC
+# 数据库连接用户名
+DB_USERNAME=postgres
+# 数据库连接密码
+DB_PASSWORD=123456
+# 数据源最小空闲连接数
+DATASOURCE_MINIMUM_IDLE=2
+# 数据源最大空闲连接数
+DATASOURCE_MAXIMUM_POOL_SIZE=10
 ```
 
 #### 开启editorconfig支持步骤

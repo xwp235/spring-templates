@@ -49,9 +49,6 @@ spring:
       filter:
         enabled: on
     static-path-pattern: /static/**
-    view:
-      prefix: /templates/
-      suffix: .jte
   task:
     scheduling:
       pool:
@@ -70,7 +67,23 @@ spring:
       shutdown:
         await-termination: on
         await-termination-period: PT3M
-
+  datasource:
+    url: ${DB_URL}
+    driver-class-name: ${DB_DRIVER:org.postgresql.Driver}
+    type: com.zaxxer.hikari.HikariDataSource
+    hikari:
+      username: ${DB_USERNAME}
+      password: ${DB_PASSWORD}
+      connection-timeout: 30000
+      read-only: off
+      minimum-idle: ${DATASOURCE_MINIMUM_IDLE:2}
+      maximum-pool-size: ${DATASOURCE_MAXIMUM_POOL_SIZE:10}
+      auto-commit: on
+      max-lifetime: 600000
+      idle-timeout: 300000
+      connection-test-query: select 1
+      validation-timeout: 1500
+      pool-name: ${spring.application.name}-HikariCP
 config:
   default-timezone: ${APP_TIMEZONE:spring.jackson.time-zone}
   default-datetime-pattern: ${APP_DATETIME_PATTERN:spring.jackson.date-format}
