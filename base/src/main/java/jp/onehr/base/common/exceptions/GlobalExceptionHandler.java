@@ -28,22 +28,17 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.HttpMediaTypeNotAcceptableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
-import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingPathVariableException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.async.AsyncRequestTimeoutException;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.NoHandlerFoundException;
-import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -65,7 +60,7 @@ public class GlobalExceptionHandler {
     @Value("${spring.servlet.multipart.max-file-size}")
     private DataSize maxFileSize;
 
-    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    //    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public Object httpRequestMethodNotSupportedException(HttpServletRequest request) {
         var message = SpringUtil.getMessage("request_method_not_supported");
         var httpStatus = HttpStatus.METHOD_NOT_ALLOWED;
@@ -80,7 +75,7 @@ public class GlobalExceptionHandler {
         }
     }
 
-    @ExceptionHandler(NoHandlerFoundException.class)
+    //    @ExceptionHandler(NoHandlerFoundException.class)
     public void noHandlerFoundException(HttpServletRequest request, HttpServletResponse response) throws IOException {
         var httpStatus = HttpStatus.NOT_FOUND;
         var message = SpringUtil.getMessage("notFound");
@@ -95,7 +90,7 @@ public class GlobalExceptionHandler {
         }
     }
 
-    @ExceptionHandler(NoResourceFoundException.class)
+    //    @ExceptionHandler(NoResourceFoundException.class)
     public Object noResourceFoundException(HttpServletRequest request) {
         var httpStatus = HttpStatus.NOT_FOUND;
         var message = SpringUtil.getMessage("error_resource_not_found");
@@ -110,7 +105,7 @@ public class GlobalExceptionHandler {
         }
     }
 
-    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    //    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public Object httpMediaTypeNotSupportedException(HttpServletRequest request, HttpMediaTypeNotSupportedException e) {
         var httpStatus = HttpStatus.UNSUPPORTED_MEDIA_TYPE;
         var message = SpringUtil.getMessage("error_request_media_type_not_supported");
@@ -129,9 +124,9 @@ public class GlobalExceptionHandler {
     /**
      * 业务异常统一处理
      */
-    @ExceptionHandler(AppException.class)
-    @ResponseBody
-    @ResponseStatus(HttpStatus.OK)
+//    @ExceptionHandler(AppException.class)
+//    @ResponseBody
+//    @ResponseStatus(HttpStatus.OK)
     public JsonResp appException(AppException e) {
         var rootErrorInfo = getRootErrorInfo(e);
         var message = e.getMessage();
@@ -158,7 +153,7 @@ public class GlobalExceptionHandler {
                 .setExceptionTypeWithTraceId(level);
     }
 
-    @ExceptionHandler(Exception.class)
+    //    @ExceptionHandler(Exception.class)
     public Object exception(Exception e, HttpServletRequest request) {
         var message = SpringUtil.getMessage("serverInternalError");
         var httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;

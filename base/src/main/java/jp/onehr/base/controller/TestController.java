@@ -112,7 +112,7 @@ public class TestController {
         try {
             int a = 1 / 0;
         } catch (Exception e) {
-//           throw new AppException(e);
+            throw new AppException(true, e);
         }
     }
 
@@ -207,6 +207,12 @@ public class TestController {
     @PostMapping("15")
     public void test15(@RequestBody User user) {
         System.out.println(user);
+    }
+
+    @GetMapping("16")
+    public void test16() {
+        Person p = null;
+        System.out.println(p.getPname());
     }
 
     public static class Person {
