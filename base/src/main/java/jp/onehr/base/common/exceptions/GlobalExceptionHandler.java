@@ -6,6 +6,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jp.onehr.base.InitTemplateApplication;
 import jp.onehr.base.common.enums.ExceptionLevel;
+import jp.onehr.base.common.exceptions.resolver.AppException;
 import jp.onehr.base.common.resp.JsonResp;
 import jp.onehr.base.common.utils.JsonUtil;
 import jp.onehr.base.common.utils.ServletUtil;

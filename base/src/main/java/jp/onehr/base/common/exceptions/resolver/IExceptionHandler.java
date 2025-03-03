@@ -1,4 +1,4 @@
-package jp.onehr.base.common.exceptions;
+package jp.onehr.base.common.exceptions.resolver;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

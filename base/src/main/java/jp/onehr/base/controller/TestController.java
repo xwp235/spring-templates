@@ -5,7 +5,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jp.onehr.base.common.enums.ExceptionLevel;
-import jp.onehr.base.common.exceptions.AppException;
+import jp.onehr.base.common.exceptions.resolver.AppException;
 import jp.onehr.base.common.utils.SpringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

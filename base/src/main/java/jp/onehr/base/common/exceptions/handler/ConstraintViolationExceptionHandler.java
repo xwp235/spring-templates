@@ -4,7 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import jp.onehr.base.common.exceptions.AbstractExceptionHandler;
+import jp.onehr.base.common.exceptions.resolver.AbstractExceptionHandler;
 import jp.onehr.base.common.resp.JsonResp;
 import jp.onehr.base.common.utils.ServletUtil;
 import jp.onehr.base.common.utils.SpringUtil;

@@ -1,4 +1,4 @@
-package jp.onehr.base.common.exceptions;
+package jp.onehr.base.common.exceptions.resolver;
 
 import jp.onehr.base.common.constants.StatusCodeConstants;
 import jp.onehr.base.common.enums.ExceptionLevel;
@@ -6,8 +6,9 @@ import jp.onehr.base.common.utils.SpringUtil;
 
 import java.io.Serial;
 
-public class AppException extends StatefulException {
+public class AppException extends RuntimeException {
 
+    private final int code;
     private final ExceptionLevel level;
     private final boolean shouldLog;
 
@@ -15,72 +16,81 @@ public class AppException extends StatefulException {
     private static final long serialVersionUID = 6057602589533840890L;
 
     public AppException(boolean shouldLog) {
-        super(StatusCodeConstants.SERVER_INTERNAL_ERROR,
-                SpringUtil.getMessage("serverInternalError"),null, false, false);
+        super(SpringUtil.getMessage("serverInternalError"), null, false, false);
+        this.code = StatusCodeConstants.SERVER_INTERNAL_ERROR;
         this.level = ExceptionLevel.ERROR;
         this.shouldLog = shouldLog;
     }
 
     public AppException(boolean shouldLog, Throwable throwable) {
-        super(StatusCodeConstants.SERVER_INTERNAL_ERROR,
-                SpringUtil.getMessage("serverInternalError"), throwable, false, false);
+        super(SpringUtil.getMessage("serverInternalError"), throwable, false, false);
+        this.code = StatusCodeConstants.SERVER_INTERNAL_ERROR;
         this.level = ExceptionLevel.ERROR;
         this.shouldLog = shouldLog;
     }
 
-    public AppException(int code, boolean shouldLog,ExceptionLevel level, Throwable throwable) {
-        super(code, SpringUtil.getMessage("serverInternalError"), throwable, false, false);
+    public AppException(int code, boolean shouldLog, ExceptionLevel level, Throwable throwable) {
+        super(SpringUtil.getMessage("serverInternalError"), throwable, false, false);
+        this.code = code;
         this.level = level;
         this.shouldLog = shouldLog;
     }
 
     public AppException(int code, boolean shouldLog, ExceptionLevel level) {
-        super(code, SpringUtil.getMessage("serverInternalError"), null, false, false);
+        super(SpringUtil.getMessage("serverInternalError"), null, false, false);
+        this.code = code;
         this.level = level;
         this.shouldLog = shouldLog;
     }
 
     public AppException(int code, String message, boolean shouldLog, ExceptionLevel level, Throwable throwable) {
-        super(code,message, throwable, false, false);
+        super(message, throwable, false, false);
+        this.code = code;
         this.level = level;
         this.shouldLog = shouldLog;
     }
 
-    public AppException(int code,String message, boolean shouldLog, ExceptionLevel level) {
-        super(code,message, null, false, false);
+    public AppException(int code, String message, boolean shouldLog, ExceptionLevel level) {
+        super(message, null, false, false);
+        this.code = code;
         this.level = level;
         this.shouldLog = shouldLog;
     }
 
-    public AppException(String message,boolean shouldLog, ExceptionLevel level) {
-        super(StatusCodeConstants.SERVER_INTERNAL_ERROR, message, null, false, false);
+    public AppException(String message, boolean shouldLog, ExceptionLevel level) {
+        super(message, null, false, false);
+        this.code = StatusCodeConstants.SERVER_INTERNAL_ERROR;
         this.level = level;
         this.shouldLog = shouldLog;
     }
 
     public AppException(String message, boolean shouldLog, ExceptionLevel level, Throwable throwable) {
-        super(StatusCodeConstants.SERVER_INTERNAL_ERROR, message, throwable, false, false);
+        super(message, throwable, false, false);
+        this.code = StatusCodeConstants.SERVER_INTERNAL_ERROR;
         this.level = level;
         this.shouldLog = shouldLog;
     }
 
 
     public AppException(String message, boolean shouldLog, Throwable throwable) {
-        super(StatusCodeConstants.SERVER_INTERNAL_ERROR, message, throwable, false, false);
+        super(message, throwable, false, false);
+        this.code = StatusCodeConstants.SERVER_INTERNAL_ERROR;
         this.level = ExceptionLevel.ERROR;
         this.shouldLog = shouldLog;
     }
 
     public AppException(int code, String message, Throwable throwable) {
-        super(code, message, throwable, false, false);
+        super(message, throwable, false, false);
+        this.code = code;
         this.level = ExceptionLevel.ERROR;
         this.shouldLog = true;
     }
 
     public AppException(int code, String message, boolean shouldLog) {
-        super(code, message, null, false, false);
+        super(message, null, false, false);
+        this.code = code;
         this.shouldLog = shouldLog;
-        if(shouldLog) {
+        if (shouldLog) {
             this.level = ExceptionLevel.ERROR;
         } else {
             this.level = ExceptionLevel.INFO;
@@ -93,6 +103,10 @@ public class AppException extends StatefulException {
 
     public boolean shouldLog() {
         return this.shouldLog;
+    }
+
+    public int getCode() {
+        return this.code;
     }
 
 }

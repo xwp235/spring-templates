@@ -1,11 +1,14 @@
-package jp.onehr.base.common.exceptions;
+package jp.onehr.base.common.exceptions.resolver;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jp.onehr.base.InitTemplateApplication;
+import jp.onehr.base.common.enums.ExceptionLevel;
+import jp.onehr.base.common.exceptions.RootErrorInfo;
 import jp.onehr.base.common.resp.JsonResp;
+import jp.onehr.base.common.utils.ServletUtil;
 import jp.onehr.base.common.utils.SpringUtil;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ClassUtils;
@@ -43,11 +46,11 @@ public abstract class AbstractExceptionHandler implements IExceptionHandler {
                                                HttpServletResponse response,
                                                Object handler,
                                                Exception e) {
+        ModelAndView modelAndView;
         try {
             response.setCharacterEncoding(StandardCharsets.UTF_8.displayName());
             response.setStatus(httpStatus.value());
             var responseData = this.doHandler(request, response, handler, e);
-            ModelAndView modelAndView;
             if (responseData instanceof JsonResp r) {
                 if (Objects.isNull(mappingJackson2JsonView)) {
                     mappingJackson2JsonView = new MappingJackson2JsonView(objectMapper);
@@ -59,7 +62,23 @@ public abstract class AbstractExceptionHandler implements IExceptionHandler {
                 return (ModelAndView) responseData;
             }
         } catch (Exception ex) {
-            return null;
+            logger.error("handle exception error occurred!", ex);
+            var serverInternalError = HttpStatus.INTERNAL_SERVER_ERROR;
+            response.setCharacterEncoding(StandardCharsets.UTF_8.displayName());
+            response.setStatus(serverInternalError.value());
+            if (ServletUtil.isAjaxRequest(request)) {
+                if (Objects.isNull(mappingJackson2JsonView)) {
+                    mappingJackson2JsonView = new MappingJackson2JsonView(objectMapper);
+                }
+                modelAndView = new ModelAndView(mappingJackson2JsonView);
+                modelAndView.addAllObjects(JsonResp
+                        .error(ex.getMessage())
+                        .setCode(serverInternalError.value())
+                        .setExceptionTypeWithTraceId(ExceptionLevel.ERROR));
+            } else {
+                modelAndView = errorView(ex.getMessage(), serverInternalError);
+            }
+            return modelAndView;
         }
     }
 
@@ -108,6 +127,14 @@ public abstract class AbstractExceptionHandler implements IExceptionHandler {
         return getRootInfoDetail(stackTrace, rootPackage);
     }
 
+    protected final void printDevLog(String message, Exception e) {
+        var activeProfile = SpringUtil.getActiveProfile();
+        var isDev = StringUtils.equalsIgnoreCase("dev", activeProfile);
+        if (isDev) {
+            logger.error(message, e);
+        }
+    }
+
     private RootErrorInfo getRootInfoDetail(StackTraceElement[] stackTrace, String rootPackage) {
         var info = stackTrace[0];
         for (var stackTraceElement : stackTrace) {
@@ -118,14 +145,6 @@ public abstract class AbstractExceptionHandler implements IExceptionHandler {
             }
         }
         return new RootErrorInfo(info.getLineNumber(), info.getClassName(), info.getMethodName());
-    }
-
-    protected final void printDevLog(String message, Exception e) {
-        var activeProfile = SpringUtil.getActiveProfile();
-        var isDev = StringUtils.equalsIgnoreCase("dev", activeProfile);
-        if (isDev) {
-            logger.error(message, e);
-        }
     }
 
 }

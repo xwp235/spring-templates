@@ -1,4 +1,4 @@
-package jp.onehr.base.common.exceptions;
+package jp.onehr.base.common.exceptions.resolver;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,7 +18,6 @@ public class WebExceptionResolver extends AbstractHandlerExceptionResolver {
         setOrder(Ordered.HIGHEST_PRECEDENCE);
         // 最高优先级
         this.handlers = handlers;
-        System.err.println("handlers size:" + handlers.size());
     }
 
     @Override

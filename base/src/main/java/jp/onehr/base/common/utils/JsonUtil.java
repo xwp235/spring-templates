@@ -7,13 +7,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jp.onehr.base.common.constants.StatusCodeConstants;
-import jp.onehr.base.common.exceptions.AppException;
+import jp.onehr.base.common.exceptions.resolver.AppException;
 import org.springframework.beans.BeanUtils;
 
 import java.util.Objects;
 
 public class JsonUtil {
-    
+
     private static ObjectMapper mapper;
 
     /**
