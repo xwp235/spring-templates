@@ -30,7 +30,8 @@
         <dotenv-java.version>3.1.0</dotenv-java.version>
         <juniversalchardet.version>2.5.0</juniversalchardet.version>
         <bucket4j.version>8.14.0</bucket4j.version>
-        <p6spy-spring-boot-starter.version>1.10.0</p6spy-spring-boot-starter.version>
+        <datasource-proxy-spring-boot-starter.version.version>1.10.0
+        </datasource-proxy-spring-boot-starter.version.version>
         <commons-collections4.version>4.4</commons-collections4.version>
         <commons-text.version>1.13.0</commons-text.version>
         <commons-io.version>2.18.0</commons-io.version>
@@ -101,8 +102,8 @@
             <!-- https://github.com/gavlyukovskiy/spring-boot-data-source-decorator -->
             <dependency>
                 <groupId>com.github.gavlyukovskiy</groupId>
-                <artifactId>p6spy-spring-boot-starter</artifactId>
-                <version>${p6spy-spring-boot-starter.version}</version>
+                <artifactId>datasource-proxy-spring-boot-starter</artifactId>
+                <version>${datasource-proxy-spring-boot-starter.version}</version>
             </dependency>
             <!-- https://github.com/apache/commons-collections -->
             <dependency>
