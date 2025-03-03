@@ -89,6 +89,12 @@ public abstract class AbstractExceptionHandler implements IExceptionHandler {
         return mav;
     }
 
+    protected final ModelAndView redirect404View() {
+        var mav = new ModelAndView();
+        mav.setViewName("redirect:/404");
+        return mav;
+    }
+
     protected RootErrorInfo getRootErrorInfo(Throwable e) {
         var rootCause = ExceptionUtils.getRootCause(e);
         if (Objects.isNull(rootCause)) {
@@ -114,7 +120,7 @@ public abstract class AbstractExceptionHandler implements IExceptionHandler {
         return new RootErrorInfo(info.getLineNumber(), info.getClassName(), info.getMethodName());
     }
 
-    protected void printDevLog(String message, Exception e) {
+    protected final void printDevLog(String message, Exception e) {
         var activeProfile = SpringUtil.getActiveProfile();
         var isDev = StringUtils.equalsIgnoreCase("dev", activeProfile);
         if (isDev) {

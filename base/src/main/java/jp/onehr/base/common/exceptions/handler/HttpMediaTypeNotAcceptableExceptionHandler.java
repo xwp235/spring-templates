@@ -8,30 +8,30 @@ import jp.onehr.base.common.utils.ServletUtil;
 import jp.onehr.base.common.utils.SpringUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.servlet.resource.NoResourceFoundException;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
 
 @Component
-public class NoResourceFoundExceptionHandler extends AbstractExceptionHandler {
+public class HttpMediaTypeNotAcceptableExceptionHandler extends AbstractExceptionHandler {
 
     @Override
     public boolean support(Exception e) {
-        return NoResourceFoundException.class.isAssignableFrom(e.getClass());
+        return HttpMediaTypeNotAcceptableException.class.isAssignableFrom(e.getClass());
     }
 
-    public NoResourceFoundExceptionHandler() {
+    public HttpMediaTypeNotAcceptableExceptionHandler() {
         super(HttpStatus.OK);
     }
 
     @Override
     public Object doHandler(HttpServletRequest request, HttpServletResponse response, Object handler, Exception e) {
-        var message = SpringUtil.getMessage("error_resource_not_found");
-        var httpStatus = HttpStatus.NOT_FOUND;
+        var message = SpringUtil.getMessage("error_http_media_type_not_acceptable");
+        var httpStatus = HttpStatus.NOT_ACCEPTABLE;
         if (ServletUtil.isAjaxRequest(request)) {
             return JsonResp
                     .error(message)
                     .setCode(httpStatus.value());
         } else {
-            return redirect404View();
+            return errorView(message, httpStatus);
         }
     }
 

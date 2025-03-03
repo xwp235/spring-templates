@@ -16,16 +16,17 @@ public class HttpMediaTypeNotSupportedExceptionHandler extends AbstractException
 
     @Override
     public boolean support(Exception e) {
-        return e instanceof HttpMediaTypeNotSupportedException;
+        return HttpMediaTypeNotSupportedException.class.isAssignableFrom(e.getClass());
     }
 
     public HttpMediaTypeNotSupportedExceptionHandler() {
-        super(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+        super(HttpStatus.OK);
     }
 
     @Override
     public Object doHandler(HttpServletRequest request, HttpServletResponse response, Object handler, Exception e) {
         var message = SpringUtil.getMessage("error_request_media_type_not_supported");
+        var httpStatus = HttpStatus.UNSUPPORTED_MEDIA_TYPE;
         if (ServletUtil.isAjaxRequest(request)) {
             return JsonResp
                     .error(message)

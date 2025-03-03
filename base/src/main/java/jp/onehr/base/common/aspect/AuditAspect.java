@@ -1,6 +1,7 @@
 package jp.onehr.base.common.aspect;
 
 import jp.onehr.base.common.annotation.OperationAudit;
+import jp.onehr.base.common.constants.AppConstants;
 import jp.onehr.base.common.entity.AuditRecord;
 import jp.onehr.base.common.service.AuditService;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -9,6 +10,7 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
@@ -51,6 +53,7 @@ public class AuditAspect implements BeanFactoryAware {
         var record = prepareAuditRecord(auditAnnotation, ctx);
         // 记录前置状态
         record.setPreState(evaluateExpression(auditAnnotation.preState(), ctx));
+        record.setLogId(MDC.get(AppConstants.MDC.LOG_ID));
         try {
             var result = joinPoint.proceed();
             // 记录执行结果及操作后的状态

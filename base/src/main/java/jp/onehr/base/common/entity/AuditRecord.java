@@ -13,6 +13,7 @@ public class AuditRecord {
     private String postState;
     private boolean success;
     private String errorMessage;
+    private String logId;
 
     public Long getId() {
         return id;
@@ -49,7 +50,7 @@ public class AuditRecord {
     public ZonedDateTime getOperationTime() {
         return operationTime;
     }
-    
+
     public String getPreState() {
         return preState;
     }
@@ -82,4 +83,16 @@ public class AuditRecord {
         this.errorMessage = errorMessage;
     }
 
+    public void setOperationTime(ZonedDateTime operationTime) {
+        this.operationTime = operationTime;
+    }
+
+    public String getLogId() {
+        return logId;
+    }
+
+    public void setLogId(String logId) {
+        this.logId = logId;
+    }
+    
 }

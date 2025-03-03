@@ -17,7 +17,7 @@ public class AppExceptionHandler extends AbstractExceptionHandler {
 
     @Override
     public boolean support(Exception e) {
-        return e instanceof AppException;
+        return AppException.class.isAssignableFrom(e.getClass());
     }
 
     public AppExceptionHandler() {

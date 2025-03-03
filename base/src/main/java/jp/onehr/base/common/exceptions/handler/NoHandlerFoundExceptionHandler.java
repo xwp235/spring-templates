@@ -15,22 +15,23 @@ public class NoHandlerFoundExceptionHandler extends AbstractExceptionHandler {
 
     @Override
     public boolean support(Exception e) {
-        return e instanceof NoHandlerFoundException;
+        return NoHandlerFoundException.class.isAssignableFrom(e.getClass());
     }
 
     public NoHandlerFoundExceptionHandler() {
-        super(HttpStatus.NOT_FOUND);
+        super(HttpStatus.OK);
     }
 
     @Override
     public Object doHandler(HttpServletRequest request, HttpServletResponse response, Object handler, Exception e) {
         var message = SpringUtil.getMessage("notFound");
+        var httpStatus = HttpStatus.NOT_FOUND;
         if (ServletUtil.isAjaxRequest(request)) {
             return JsonResp
                     .error(message)
                     .setCode(httpStatus.value());
         } else {
-            return redirectView("/404");
+            return redirect404View();
         }
     }
 
