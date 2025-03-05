@@ -6,6 +6,8 @@ import jp.onehr.base.common.config.serializer.LocalDateTimeSerializer;
 import jp.onehr.base.common.config.serializer.ZonedDateTimeSerializer;
 import jp.onehr.base.common.constants.AppConstants;
 import jp.onehr.base.common.filters.EntryPointFilter;
+import jp.onehr.base.common.interceptor.ExecutionTimeInterceptor;
+import org.springframework.aop.aspectj.AspectJExpressionPointcutAdvisor;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -95,19 +97,13 @@ public class AppConfig implements WebMvcConfigurer {
         return registrationBean;
     }
 
-// 有ExceptionHandler注解时重写此方法无效
-//    @Override
-//    public void extendHandlerExceptionResolvers(List<HandlerExceptionResolver> resolvers) {
-//        resolvers.remove(resolvers.size()-1);
-//        resolvers.add(new DefaultHandlerExceptionResolver(){
-//            @Override
-//            public ModelAndView handleNoHandlerFoundException(NoHandlerFoundException ex,
-//                                                                 HttpServletRequest request,
-//                                                                 HttpServletResponse response,
-//                                                                 Object handler) throws IOException {
-//                return new ModelAndView((model, request1, response1) -> ServletUtil.getWriter(response1).println(ex.getMessage()));
-//            }
-//        });
-//    }
+    @Bean
+    AspectJExpressionPointcutAdvisor aspectJExpressionPointcutAdvisor() {
+        var advisor = new AspectJExpressionPointcutAdvisor();
+        advisor.setExpression("execution(* jp.onehr.base.modules.*..*(..))||execution(* jp.onehr.base.controller.*.*(..))");
+//        advisor.setExpression("execution(* jp.onehr.base.modules.usermanage.service.*.*(..))||execution(* jp.onehr.base.controller.*.*(..))");
+        advisor.setAdvice(new ExecutionTimeInterceptor());
+        return advisor;
+    }
 
 }

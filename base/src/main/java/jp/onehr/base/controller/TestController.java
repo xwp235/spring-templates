@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Min;
 import jp.onehr.base.common.enums.ExceptionLevel;
 import jp.onehr.base.common.exceptions.resolver.AppException;
 import jp.onehr.base.common.utils.SpringUtil;
+import jp.onehr.base.modules.usermanage.service.OrderService;
+import jp.onehr.base.modules.usermanage.service.ShopUserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
@@ -29,9 +31,14 @@ public class TestController {
     private static final Logger logger = LoggerFactory.getLogger(TestController.class);
 
     private final UserService userService;
+    private final ShopUserService shopUserService;
+    private final OrderService orderService;
 
-    public TestController(UserService userService) {
+    public TestController(UserService userService, ShopUserService shopUserService,
+                          OrderService orderService) {
         this.userService = userService;
+        this.shopUserService = shopUserService;
+        this.orderService = orderService;
     }
 
     @GetMapping("1")
@@ -213,6 +220,12 @@ public class TestController {
     public void test16() {
         Person p = null;
         System.out.println(p.getPname());
+    }
+
+    @GetMapping("17")
+    public void test17() {
+        shopUserService.queryUser();
+        orderService.queryOrder();
     }
 
     public static class Person {
