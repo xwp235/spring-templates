@@ -1,6 +1,7 @@
 package jp.onehr.base.modules.usermanage.service;
 
 import jp.onehr.base.common.service.UserHandler;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
@@ -23,9 +24,13 @@ public class UserManagerService {
     private final DataSourceTransactionManager transactionManager;
     private final TransactionTemplate transactionTemplate;
     private final JdbcClient jdbcClient;
+    private final JdbcTemplate jdbcTemplate;
 
-    public UserManagerService(DataSourceTransactionManager transactionManager, JdbcClient jdbcClient) {
+    public UserManagerService(DataSourceTransactionManager transactionManager,
+                              JdbcClient jdbcClient,
+                              JdbcTemplate jdbcTemplate) {
         this.jdbcClient = jdbcClient;
+        this.jdbcTemplate = jdbcTemplate;
         this.transactionManager = transactionManager;
         this.transactionTemplate = new TransactionTemplate(transactionManager);
         this.transactionTemplate.setIsolationLevel(TransactionDefinition.ISOLATION_DEFAULT);
@@ -40,6 +45,7 @@ public class UserManagerService {
                     String sql = "update t_users t set t.username = :un, t.password = :pwd where t.id = :id";
                     Map<String, Object> params = Map.of("un", "guest007", "pwd", "99999", "id", "666");
                     int ret = jdbcClient.sql(sql).params(params).update();
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     // 当发生异常后设置为回滚

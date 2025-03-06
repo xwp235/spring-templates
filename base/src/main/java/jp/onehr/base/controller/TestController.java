@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jp.onehr.base.common.enums.ExceptionLevel;
 import jp.onehr.base.common.exceptions.resolver.AppException;
+import jp.onehr.base.common.utils.DbBatchProcessUtils;
 import jp.onehr.base.common.utils.SpringUtil;
 import jp.onehr.base.modules.usermanage.service.OrderService;
 import jp.onehr.base.modules.usermanage.service.ShopUserService;
@@ -24,6 +25,7 @@ import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.stream.IntStream;
 
 @RestController
 public class TestController {
@@ -226,6 +228,19 @@ public class TestController {
     public void test17() {
         shopUserService.queryUser();
         orderService.queryOrder();
+    }
+
+    @GetMapping("18")
+    public void test18() {
+        var ids = IntStream.rangeClosed(1, 65535)
+                .boxed()
+                .toList();
+        DbBatchProcessUtils.batchQueryIn(ids, 65535);
+    }
+
+    @GetMapping("19")
+    public void test19() {
+        DbBatchProcessUtils.batchInsert();
     }
 
     public static class Person {

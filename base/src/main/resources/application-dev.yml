@@ -1,3 +1,20 @@
 spring:
   application:
     name: init-template-dev
+decorator:
+  datasource:
+    datasource-proxy:
+      logging: slf4j
+      query:
+        enable-logging: off
+        log-level: debug
+      format-sql: on
+      json-format: on
+      count-query: on
+      multiline: on
+      slow-query:
+        enable-logging: on
+        threshold: 1
+        log-level: warn
+
+
