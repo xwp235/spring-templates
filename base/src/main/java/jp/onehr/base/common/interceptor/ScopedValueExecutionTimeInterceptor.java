@@ -9,28 +9,39 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
-public class ExecutionTimeInterceptor implements MethodInterceptor {
+public class ScopedValueExecutionTimeInterceptor implements MethodInterceptor {
 
-    private static final InheritableThreadLocal<Deque<MethodNode>> METHOD_NODE_STACK = new InheritableThreadLocal<>() {
-        @Override
-        public Deque<MethodNode> initialValue() {
-            return new ArrayDeque<>();
-        }
-    };
-    private static final InheritableThreadLocal<MethodNode> ROOT_METHOD_NODE = new InheritableThreadLocal<>();
+    private static final ScopedValue<Deque<MethodNode>> METHOD_NODE_STACK = ScopedValue.newInstance();
+    private static final ScopedValue<MethodNode> ROOT_METHOD_NODE = ScopedValue.newInstance();
 
     @Override
     public Object invoke(MethodInvocation invocation) throws Throwable {
         var method = invocation.getMethod();
         var methodName = method.getDeclaringClass() + "#" + method.getName();
         var currentMethodNode = new MethodNode(methodName);
-        var stack = METHOD_NODE_STACK.get();
+
+        Deque<MethodNode> stack = METHOD_NODE_STACK.isBound() ? METHOD_NODE_STACK.get() : new ArrayDeque<>();
+
         if (stack.isEmpty()) {
-            ROOT_METHOD_NODE.set(currentMethodNode);
+            // 创建新的作用域
+            return ScopedValue.where(ROOT_METHOD_NODE, currentMethodNode)
+                    .where(METHOD_NODE_STACK, stack)
+                    .call(() -> {
+                        try {
+                            return execute(invocation, currentMethodNode, stack);
+                        } catch (Throwable e) {
+                            throw new RuntimeException(e);
+                        }
+                    });
         } else {
+            // 继续当前作用域
             stack.peek().add(currentMethodNode);
+            stack.push(currentMethodNode);
+            return execute(invocation, currentMethodNode, stack);
         }
-        stack.push(currentMethodNode);
+    }
+
+    private Object execute(MethodInvocation invocation, MethodNode currentMethodNode, Deque<MethodNode> stack) throws Throwable {
         var startTime = System.currentTimeMillis();
         try {
             return invocation.proceed();
@@ -38,11 +49,10 @@ public class ExecutionTimeInterceptor implements MethodInterceptor {
             var endTime = System.currentTimeMillis();
             currentMethodNode.setDuration(endTime - startTime);
             stack.pop();
+
             if (stack.isEmpty()) {
                 System.out.println("Call Tree (Total: " + ROOT_METHOD_NODE.get().getDuration() + "ms)");
                 printTree(ROOT_METHOD_NODE.get());
-                ROOT_METHOD_NODE.remove();
-                METHOD_NODE_STACK.remove();
             }
         }
     }
